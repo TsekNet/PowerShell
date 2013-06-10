@@ -1,0 +1,1 @@
+Searches Active Directory for inactive user accounts.
