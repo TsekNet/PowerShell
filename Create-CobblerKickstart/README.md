@@ -1,0 +1,1 @@
+Create Cobbler Kickstart command from XLSX import - used to kick off linux builds using cobbler kickstart config file. --- out of date
