@@ -1,0 +1,1 @@
+Prompt user for Bitlocker password after bitlocker/TPM has already been enabled.
