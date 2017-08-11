@@ -1,7 +1,7 @@
 Automate new hire process using PowerShell GUI!
 
 Preview:
-<img src="http://i.imgur.com/h25ofBW.png">
+<p><img src="http://i.imgur.com/iEAiNHp.png"></p>
 
 Includes:
 
