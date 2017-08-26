@@ -18,3 +18,8 @@ Powershell Form GUI used to Automate new hire process.
 - Delegated permissions to create users in active directory
 - PowerShell 5.0
 
+## Instructions
+- Replace variables with your domain names and OU formats
+- Run using right click -> run as different user from the shortcut provided.
+  - This user should have delegated access to both active directory structures
+
