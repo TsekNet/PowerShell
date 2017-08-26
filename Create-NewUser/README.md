@@ -1,12 +1,20 @@
-Powershell Form GUI used to:
-Automate new hire process. Includes:
+Create-NewUser
+========
 
-Creating user account based on copied user.
+Powershell Form GUI used to Automate new hire process. 
 
-Sending new hire welcome email (cc hr)
+## Includes:
+- Creating user account based on copied user.
+- Sending automated HTML new hire welcome email
+- Creating file server share
+- Data validation
+- Data output and confirmation
+- Error handling
+- Real Time Progressbar
 
-Creating file server share
+## Requirements
+- RSAT to be installed on system executing this script
+- Two active directory domains 
+- Delegated permissions to create users in active directory
+- PowerShell 5.0
 
-Real Time Progressbar
-
-Requires RSAT to be installed on system executing this script
