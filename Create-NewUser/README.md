@@ -1,8 +1,6 @@
 Create-NewUser
 ========
 
-Powershell Form GUI used to Automate new hire process. 
-
 ## Includes:
 - Creating user account based on copied user.
 - Sending automated HTML new hire welcome email
