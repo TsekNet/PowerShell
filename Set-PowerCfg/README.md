@@ -1,1 +1,0 @@
-Enable Custom Laptop Power Config Settings such as don't sleep when lid closed
