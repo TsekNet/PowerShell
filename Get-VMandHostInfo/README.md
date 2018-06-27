@@ -6,15 +6,18 @@ Get-VMandHostInfo
 - CPU
 - HDD
 - ESXi Host VM belongs to
+- Outputs to c:\temp\vms.html file
 
 ## Gathers ESXi Host information:
 - RAM (Perecent Used / Amount used / Amount Total)
 - CPU (Percent Used / Count)
+- Outputs to c:\temp\hosts.html file
 
 ## Gathers ESXi datastore information:
 - Datastore % used
 - Amount Used
 - Capacity
+- Outputs to c:\temp\hosts.html file
 
 ## Requirements
 - PowerShell 3.0+
