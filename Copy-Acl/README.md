@@ -1,6 +1,7 @@
 # Copy-Acl
 - Copys the ACL from one folder to other folder(s)
-- Uses Get-Acl and Set-Acl PowerShell cmdlets to completely strip the ACL from the destination folder, then copy the ACL from the source folder)
+- Uses Get-Acl and Set-Acl PowerShell cmdlets to completely strip the ACL from the destination folder, then copy the ACL from the source folder
+- Includes error handling via try/catch
 
 ## Parameters:
 - [string]$SourceFolder = The folder that you want the permissions copied from 
