@@ -63,3 +63,7 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
     # If that didn't work ... oh well.
   }
 }
+
+# Allow Emoji's
+$OutputEncoding = [System.Console]::OutputEncoding = [System.Console]::InputEncoding = [System.Text.Encoding]::UTF8
+$PSDefaultParameterValues['*:Encoding'] = 'utf8'
