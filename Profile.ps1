@@ -1,6 +1,4 @@
-﻿#requires -module powerline
-
-<#
+﻿<#
 .SYNOPSIS
   @TsekNet PowerShell Profile.
 
@@ -14,6 +12,23 @@
   (Ex: $profile.CurrentUserAllHosts)
 #>
 
+# Helper function to change directory to my development workspace
+function path {
+  $Path = 'C:\Tmp\'
+  if (-not (Test-Path -Path $Path)) {
+    New-Item -ItemType Directory -Force -Path $Path
+  }
+  Set-Location $Path
+}
+
+# Ensure that required modules are loaded
+Import-Module Get-ChildItemColor
+
+# Set l and ls alias to use the new Get-ChildItemColor cmdlets
+Set-Alias l Get-ChildItemColor -Option AllScope
+Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
+
+# Helper function to test prompt elevation
 function Test-IsAdministrator {
   $user = [Security.Principal.WindowsIdentity]::GetCurrent();
   (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
@@ -25,29 +40,7 @@ if (Test-IsAdministrator) {
 else {
   $n = "Non-Admin"
 }
-$Title = "PowerShell [$($n) | $(([regex]"\d+\.\d+.\d+").match($psversiontable.psversion).value) | $($psversiontable.psedition)]"
-
-$Path = 'C:\Tmp\'
-if (-not (Test-Path -Path $Path)) {
-  New-Item -ItemType Directory -Force -Path $Path
-}
-Set-Location $Path
-
-$global:prompt = @(
-  { "`t" } # On the first line, right-justify
-  { New-PowerLineBlock (Get-Elapsed) -ErrorBackgroundColor DarkRed -ErrorForegroundColor White -ForegroundColor Black -BackgroundColor DarkGray }
-  { Get-Date -f "T" }
-  { "`n" } # Start another line
-  { $MyInvocation.HistoryId }
-  { "&Gear;" * $NestedPromptLevel }
-  { $pwd.Drive.Name }
-  { (($pwd.Path).Replace("$($pwd.Drive.Name):\", '')).Replace('\', '' + [char]::ConvertFromUtf32(0xE0B1) + '') }
-  { "`n" } # Start another line
-  { New-PromptText { "$(New-PromptText -Fg Red -EFg White "&hearts;$([char]27)[30m")" } -Bg White -EBg Red -Fg Black }
-)
-
-Write-Output $Title
-Set-PowerLinePrompt -SetCurrentDirectory -PowerLineFont -Title { $Title } -Colors "White", "Gray", "Blue", "Cyan", "Cyan", "DarkBlue", "DarkBlue", "DarkCyan"
+Write-Output "PowerShell [$($n) | $(([regex]"\d+\.\d+.\d+").match($psversiontable.psversion).value) | $($psversiontable.psedition)]"
 
 # If it's Windows PowerShell, we can turn on Verbose output if you're holding shift
 if ("Desktop" -eq $PSVersionTable.PSEdition) {
@@ -64,6 +57,10 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
   }
 }
 
-# Allow Emoji's
-$OutputEncoding = [System.Console]::OutputEncoding = [System.Console]::InputEncoding = [System.Text.Encoding]::UTF8
-$PSDefaultParameterValues['*:Encoding'] = 'utf8'
+# PowerLine Settings
+Import-Module posh-git
+Import-Module oh-my-posh
+Set-Theme Fish
+
+# Remove username from PowerLine
+$DefaultUser = 'dantsek'
