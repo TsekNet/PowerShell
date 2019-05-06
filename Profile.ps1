@@ -13,7 +13,7 @@
 #>
 
 # Helper function to change directory to my development workspace
-function path {
+function Set-Path {
   $Path = 'C:\Tmp\'
   if (-not (Test-Path -Path $Path)) {
     New-Item -ItemType Directory -Force -Path $Path
@@ -22,7 +22,13 @@ function path {
 }
 
 # Ensure that required modules are loaded
-Import-Module Get-ChildItemColor
+try {
+  Import-Module Get-ChildItemColor -ErrorAction Stop
+}
+catch {
+  Install-Module Get-ChildItemColor -Scope CurrentUser -Repository PSGallery
+  Import-Module Get-ChildItemColor
+}
 
 # Set ll and ls alias to use the new Get-ChildItemColor cmdlets
 Set-Alias ll Get-ChildItemColor -Option AllScope
@@ -58,11 +64,28 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 }
 
 # PowerLine Settings
-Import-Module posh-git
-Import-Module oh-my-posh
+# Ensure that required modules are loaded
+try {
+  Import-Module posh-git -ErrorAction Stop
+}
+catch {
+  Install-Module posh-git -Scope CurrentUser -Repository PSGallery
+  Import-Module posh-git
+}
+# Ensure that required modules are loaded
+try {
+  Import-Module oh-my-posh -ErrorAction Stop
+}
+catch {
+  Install-Module oh-my-posh -Scope CurrentUser -Repository PSGallery
+  Import-Module oh-my-posh
+}
+
+# Set the oh-my-posh theme
 Set-Theme Paradox
 
 # Remove username from PowerLine
 Set-Variable -Name DefaultUser -Value 'dantsek' -Scope Global
 
-path
+# Set the current directory to the one set in the function above
+Set-Path
