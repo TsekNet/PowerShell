@@ -26,7 +26,7 @@ try {
   Import-Module Get-ChildItemColor -ErrorAction Stop
 }
 catch {
-  Install-Module Get-ChildItemColor -Scope CurrentUser -Repository PSGallery
+  Install-Module Get-ChildItemColor -Scope CurrentUser -Force
   Import-Module Get-ChildItemColor
 }
 
@@ -69,7 +69,7 @@ try {
   Import-Module posh-git -ErrorAction Stop
 }
 catch {
-  Install-Module posh-git -Scope CurrentUser -Repository PSGallery
+  Install-Module posh-git -Scope CurrentUser -Force
   Import-Module posh-git
 }
 
@@ -78,7 +78,7 @@ try {
   Import-Module oh-my-posh -ErrorAction Stop
 }
 catch {
-  Install-Module oh-my-posh -Scope CurrentUser -Repository PSGallery
+  Install-Module oh-my-posh -Scope CurrentUser -Force
   Import-Module oh-my-posh
 }
 
@@ -86,7 +86,7 @@ catch {
 Set-Theme Paradox
 
 # Remove username from PowerLine
-Set-Variable -Name DefaultUser -Value 'dantsek' -Scope Global
+Set-Variable -Name DefaultUser -Value $env:USERNAME -Scope Global
 
 # Set the current directory to the one set in the function above
 Set-Path
