@@ -72,6 +72,7 @@ catch {
   Install-Module posh-git -Scope CurrentUser -Repository PSGallery
   Import-Module posh-git
 }
+
 # Ensure that required modules are loaded
 try {
   Import-Module oh-my-posh -ErrorAction Stop
