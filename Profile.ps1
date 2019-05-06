@@ -64,3 +64,6 @@ Set-Theme Paradox
 
 # Remove username from PowerLine
 $DefaultUser = 'dantsek'
+
+# Set default directory
+path
