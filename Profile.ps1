@@ -24,8 +24,8 @@ function path {
 # Ensure that required modules are loaded
 Import-Module Get-ChildItemColor
 
-# Set l and ls alias to use the new Get-ChildItemColor cmdlets
-Set-Alias l Get-ChildItemColor -Option AllScope
+# Set ll and ls alias to use the new Get-ChildItemColor cmdlets
+Set-Alias ll Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
 # Helper function to test prompt elevation
@@ -63,7 +63,6 @@ Import-Module oh-my-posh
 Set-Theme Paradox
 
 # Remove username from PowerLine
-$DefaultUser = 'dantsek'
+Set-Variable -Name DefaultUser -Value 'dantsek' -Scope Global
 
-# Set default directory
 path
