@@ -60,7 +60,7 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 # PowerLine Settings
 Import-Module posh-git
 Import-Module oh-my-posh
-Set-Theme Fish
+Set-Theme Paradox
 
 # Remove username from PowerLine
 $DefaultUser = 'dantsek'
