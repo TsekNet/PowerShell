@@ -39,7 +39,7 @@ function Get-Elapsed {
   )
   $null = $PSBoundParameters.Remove("Format")
   $LastCommand = Get-History -Count 1 @PSBoundParameters
-  if (!$LastCommand) { return "" }
+  if (!$LastCommand) { return "0:00:00.0000" }
   $Duration = $LastCommand.EndExecutionTime - $LastCommand.StartExecutionTime
   $Format -f $Duration
 }
@@ -53,14 +53,14 @@ function Write-Theme {
 
   $prompt = Write-Prompt -Object $sl.PromptSymbols.StartSymbol -ForegroundColor $sl.Colors.White -BackgroundColor $sl.Colors.SessionInfoBackgroundColor
 
-  #check the last command state and indicate if failed
+  # Check the last command state and indicate if failed
   If ($lastCommandFailed) {
-    $prompt += Write-Prompt -Object $sl.PromptSymbols.FailedCommandSymbol -ForegroundColor $sl.Colors.White -BackgroundColor $sl.Colors.Red
+    $prompt += Write-Prompt -Object $sl.PromptSymbols.WarningSymbol -ForegroundColor $sl.Colors.White -BackgroundColor $sl.Colors.Red
     $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $sl.Colors.Red -BackgroundColor $sl.Colors.Cyan
   }
 
   # Add invocation number
-  $prompt += Write-Prompt -Object " $($MyInvocation.HistoryId) " -ForegroundColor $sl.Colors.DarkRed -BackgroundColor $sl.Colors.Cyan
+  $prompt += Write-Prompt -Object " $($MyInvocation.HistoryId) " -ForegroundColor $sl.Colors.DarkGray -BackgroundColor $sl.Colors.Cyan
   $prompt += Write-Prompt -Object $($sl.PromptSymbols.SegmentForwardSymbol) -ForegroundColor $sl.Colors.Cyan -BackgroundColor $sl.Colors.Gray
 
   $driveLetter = $pwd.Drive.Name
@@ -80,18 +80,19 @@ function Write-Theme {
   # Writes the drive portion
   $prompt += Write-Prompt -Object " $fullPath " -ForegroundColor $sl.Colors.White -BackgroundColor $sl.Colors.DarkCyan
 
+  # Adds Pre/Postfix to the VCS Prompt
   $status = Get-VCSStatus
   if ($status) {
     $themeInfo = Get-VcsInfo -status ($status)
-    $sl.Colors.DarkCyan = $themeInfo.BackgroundColor
-    $prompt += Write-Prompt -Object $($sl.PromptSymbols.SegmentForwardSymbol) -ForegroundColor $sl.Colors.DarkCyan -BackgroundColor $sl.Colors.DarkCyan
-    $prompt += Write-Prompt -Object " $($themeInfo.VcInfo) " -BackgroundColor $sl.Colors.DarkCyan -ForegroundColor $sl.Colors.Black
+    $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $sl.Colors.DarkCyan -BackgroundColor $sl.Colors.Magenta
+    $prompt += Write-Prompt -Object " $($themeInfo.VcInfo) " -BackgroundColor $sl.Colors.Magenta -ForegroundColor $sl.Colors.Black
+    $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $sl.Colors.Magenta
+  }
+  else {
+    $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $sl.Colors.DarkCyan
   }
 
   $timestamp = Get-Date -f "T"
-
-  # Writes the postfix to the prompt
-  $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $sl.Colors.DarkCyan
 
   # Writes the Invocation time and date
   $prompt += Set-CursorForRightBlockWrite -textLength ($timestamp.Length + 13)
@@ -120,14 +121,17 @@ $sl.Colors.Cyan = [ConsoleColor]::Cyan
 $sl.Colors.DarkBlue = [ConsoleColor]::DarkBlue
 $sl.Colors.DarkCyan = [ConsoleColor]::DarkCyan
 $sl.Colors.DarkRed = [ConsoleColor]::DarkRed
+$sl.Colors.DarkGray = [ConsoleColor]::DarkGray
 $sl.Colors.Gray = [ConsoleColor]::Gray
 $sl.Colors.Magenta = [ConsoleColor]::Magenta
 $sl.Colors.Red = [System.ConsoleColor]::Red
 $sl.Colors.White = [ConsoleColor]::White
 $sl.Colors.Yellow = [ConsoleColor]::Yellow
+$sl.Colors.BackgroundColor = $sl.Colors.DarkCyan
 $sl.PromptSymbols.ForwardHollowArrow = [char]::ConvertFromUtf32(0xE0B1)
 $sl.PromptSymbols.PromptIndicator = [char]::ConvertFromUtf32(0x276F)
 $sl.PromptSymbols.SegmentBackwardSymbol = [char]::ConvertFromUtf32(0xE0B2)
 $sl.PromptSymbols.SegmentForwardSymbol = [char]::ConvertFromUtf32(0xE0B0)
 $sl.PromptSymbols.HeartSymbol = [char]::ConvertFromUtf32(0x2764)
+$sl.PromptSymbols.WarningSymbol = [char]::ConvertFromUtf32(0x203C)
 $sl.PromptSymbols.StartSymbol = ''

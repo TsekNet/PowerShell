@@ -66,10 +66,10 @@ function Get-MyModules {
 # Helper function to test prompt elevation
 function Test-IsAdministrator {
   if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
-    $n = "Administrator"
+    $script:elevation = "Admin"
   }
   else {
-    $n = "Non-Admin"
+    $script:elevation = "Non-Admin"
   }
 }
 
@@ -96,12 +96,14 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 
 #region execution
 
+# Admin verification is used for the title window
 Test-IsAdministrator
 
-$host.ui.RawUI.WindowTitle = "PowerShell [ $($n) |
-$(([regex]"\d+\.\d+.\d+").match($psversiontable.psversion).value) |
-$($psversiontable.psedition) |
-$env:username@$env:COMPUTERNAME.$env:USERDOMAIN ]"
+# Set the Window Title
+$host.ui.RawUI.WindowTitle = "PowerShell [ $($script:elevation) |
+ $(([regex]"\d+\.\d+.\d+").match($psversiontable.psversion).value) |
+ $($psversiontable.psedition) |
+ $env:username@$env:COMPUTERNAME.$env:USERDOMAIN ]"
 
 # Import all my modules
 Get-MyModules
@@ -111,7 +113,7 @@ Set-Alias ll Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
 # Set the oh-my-posh theme
-Set-Theme Paradox
+Set-Theme Beast
 
 # Set the current directory to the one set in the function above
 Set-Path
