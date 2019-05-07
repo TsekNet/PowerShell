@@ -38,28 +38,20 @@ function Copy-LastCommand {
 
 # Helper function to ensure all modules are loaded, with error handling
 function Get-MyModules {
-  try {
-    Import-Module posh-git -ErrorAction Stop
-  }
-  catch {
-    Install-Module posh-git -Scope CurrentUser -Force
-    Import-Module posh-git
-  }
-
-  try {
-    Import-Module oh-my-posh -ErrorAction Stop
-  }
-  catch {
-    Install-Module oh-my-posh -Scope CurrentUser -Force
-    Import-Module oh-my-posh
-  }
-
-  try {
-    Import-Module Get-ChildItemColor -ErrorAction Stop
-  }
-  catch {
-    Install-Module Get-ChildItemColor -Scope CurrentUser -Force
-    Import-Module Get-ChildItemColor
+  $psgallery_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
+  foreach ($module in $psgallery_modules) {
+    try {
+      Import-Module -Name $module -ErrorAction Stop
+    }
+    catch {
+      $lookup = Find-Module -Name $module
+      if (-not $lookup) {
+        Write-Error "Module `"$module`" not found."
+        continue
+      }
+      Install-Module -Name $module -Scope CurrentUser -Force
+      Import-Module -Name $module
+    }
   }
 }
 
