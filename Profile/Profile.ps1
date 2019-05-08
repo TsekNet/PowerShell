@@ -111,7 +111,7 @@ begin {
       New-Item -ItemType Directory $theme_path
     }
     $local_theme = Get-ChildItem $theme_path | Where-Object { $_.Name -eq $theme_name } | Get-Content
-    $git_theme = Get-GitFile $git_ps_theme_url
+    $git_theme = Get-GitFile $git_ps_theme_url.AbsoluteUri
     if ($local_theme -ne $git_theme) {
       Write-Warning "Pulled latest theme settings from GitHub."
       $git_theme | Out-File "$theme_path\$theme_name" -Force
