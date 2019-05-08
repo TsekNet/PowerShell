@@ -111,10 +111,10 @@ begin {
 
     # Update local profile from github repo (if current does not match)
     $git_ps_profile = Get-GitFile $git_ps_profile_url.AbsoluteUri
-    $local_profile = Get-Content $profile.AllUsersAllHosts -Raw
+    $local_profile = Get-Content $profile.CurrentUserAllHosts -Raw
     if ($local_profile -ne $git_ps_profile) {
       Write-Warning "Updating local profile from github."
-      $git_ps_profile | Out-File $profile.AllUsersAllHosts -Force
+      $git_ps_profile | Out-File $profile.CurrentUserAllHosts -Force
     }
   }
 }
