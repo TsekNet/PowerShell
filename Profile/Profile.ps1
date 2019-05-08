@@ -105,7 +105,7 @@ begin {
     }
 
     $theme_name = ($git_ps_theme_url.AbsoluteUri -split '/' | Select-Object -Last 1).Trim()
-    $theme_path = Join-Path -Path "$($env:PSModulePath -split ';' | Select-Object -First 1)" -ChildPath "oh-my-posh\*.*.***\Themes" -Resolve
+    $theme_path = Get-ChildItem $ThemeSettings.MyThemesLocation | Where-Object { $_.Name -eq $theme_name } | Get-Content
 
     if (-not(Test-Path -Path $theme_path)) {
       New-Item -ItemType Directory $theme_path
@@ -115,10 +115,11 @@ begin {
     $git_theme = Get-GitFile $git_ps_theme_url.AbsoluteUri
     if ($local_theme -ne $git_theme) {
       Write-Warning "Pulled latest theme settings from GitHub."
-      $git_theme | Out-File "$theme_path\$theme_name" -Force
+      $git_theme | Out-File "$($ThemeSettings.MyThemesLocation)\$theme_name" -Force
     }
 
-    Set-Theme (Get-ChildItemColor "$theme_path\$theme_name")
+    Write-Verbose "Setting theme to "
+    Set-Theme (Get-Item "$($ThemeSettings.MyThemesLocation)\$theme_name").BaseName
   }
 }
 
