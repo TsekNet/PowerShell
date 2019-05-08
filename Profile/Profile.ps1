@@ -123,55 +123,56 @@ begin {
       Set-Theme Fish
     }
   }
+}
 
-  #endregion
+#endregion
 
-  #region statements
+#region statements
 
-  process {
-    # If it's Windows PowerShell, we can turn on Verbose output if you're holding shift
-    if ("Desktop" -eq $PSVersionTable.PSEdition) {
-      # Check SHIFT state ASAP at startup so I can use that to control verbosity :)
-      Add-Type -Assembly PresentationCore, WindowsBase
-      try {
-        if ([System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::LeftShift) -OR
-          [System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::RightShift)) {
-          $VerbosePreference = "Continue"
-        }
-      }
-      catch {
-        # If that didn't work ... oh well.
+process {
+  # If it's Windows PowerShell, we can turn on Verbose output if you're holding shift
+  if ("Desktop" -eq $PSVersionTable.PSEdition) {
+    # Check SHIFT state ASAP at startup so I can use that to control verbosity :)
+    Add-Type -Assembly PresentationCore, WindowsBase
+    try {
+      if ([System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::LeftShift) -OR
+        [System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::RightShift)) {
+        $VerbosePreference = "Continue"
       }
     }
+    catch {
+      # If that didn't work ... oh well.
+    }
   }
+}
 
-  #endregion
+#endregion
 
-  #region execution
+#region execution
 
-  end {
-    # Admin verification is used for the title window
-    Test-IsAdministrator
+end {
+  # Admin verification is used for the title window
+  Test-IsAdministrator
 
-    # Set the Window Title
-    $host.ui.RawUI.WindowTitle = "PowerShell [ $($script:elevation) |
+  # Set the Window Title
+  $host.ui.RawUI.WindowTitle = "PowerShell [ $($script:elevation) |
  $(([regex]"\d+\.\d+.\d+").match($psversiontable.psversion).value) |
  $($psversiontable.psedition) |
  $("$env:USERNAME@$env:COMPUTERNAME.$env:USERDOMAIN".ToLower()) ]"
 
-    # Import all my modules
-    $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
-    $my_modules | Import-MyModules
+  # Import all my modules
+  $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
+  $my_modules | Import-MyModules
 
-    # Set ll and ls alias to use the new Get-ChildItemColor cmdlets
-    Set-Alias ll Get-ChildItemColor -Option AllScope
-    Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
+  # Set ll and ls alias to use the new Get-ChildItemColor cmdlets
+  Set-Alias ll Get-ChildItemColor -Option AllScope
+  Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
-    # Set the oh-my-posh theme
-    Set-MyTheme
+  # Set the oh-my-posh theme
+  Set-MyTheme
 
-    # Set the current directory to the one set in the function above
-    Set-Path
-  }
+  # Set the current directory to the one set in the function above
+  Set-Path
+}
 
-  #endregion
+#endregion
