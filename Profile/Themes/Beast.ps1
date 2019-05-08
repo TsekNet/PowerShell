@@ -1,4 +1,6 @@
-﻿<#
+﻿if (Get-Module posh-git) { return }
+
+<#
 .Synopsis
    Custom oh-my-posh theme built by @TsekNet.
 
