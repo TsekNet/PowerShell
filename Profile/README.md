@@ -12,11 +12,11 @@ directories and restart your PowerShell console
 
 PowerShell running in an administrative window while working in C:\tmp
 
-![](PowerShell_Admin_No_Git.png)
+![PowerShell Admin](PowerShell_Admin_No_Git.png)
 
 PowerShell running in a non-admin window while working on a git repo
 
-![](PowerShell_NoAdmin_Git.png)
+![PowerShell Non-Admin](PowerShell_NoAdmin_Git.png)
 
 ## Getting Started
 

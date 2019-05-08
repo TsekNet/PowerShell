@@ -37,20 +37,26 @@ function Copy-LastCommand {
 }
 
 # Helper function to ensure all modules are loaded, with error handling
-function Get-MyModules {
-  $psgallery_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
-  foreach ($module in $psgallery_modules) {
+function Import-MyModules {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory, ValueFromPipeline)]
+    [string]
+    $Name
+  )
+
+  process {
     try {
-      Import-Module -Name $module -ErrorAction Stop
+      Import-Module -Name $Name -ErrorAction Stop
     }
     catch {
-      $lookup = Find-Module -Name $module
+      $lookup = Find-Module -Name $Name
       if (-not $lookup) {
-        Write-Error "Module `"$module`" not found."
+        Write-Error "Module `"$Name`" not found."
         continue
       }
-      Install-Module -Name $module -Scope CurrentUser -Force
-      Import-Module -Name $module
+      Install-Module -Name $Name -Scope CurrentUser -Force
+      Import-Module -Name $Name
     }
   }
 }
@@ -62,6 +68,56 @@ function Test-IsAdministrator {
   }
   else {
     $script:elevation = "Non-Admin"
+  }
+}
+
+# Download a file from GitHub
+function Get-GitFile {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory, ValueFromPipeline)]
+    [ValidatePattern('https://raw\.githubusercontent\.com.*')]
+    [string]
+    $URL
+  )
+
+  process {
+    return (Invoke-WebRequest -Uri $URL).Content
+  }
+}
+
+# Download Profile/Theme and set them
+function Set-MyTheme {
+  [CmdletBinding(SupportsShouldProcess)]
+  param (
+    [Parameter()]
+    [uri]$git_ps_profile_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1',
+    [Parameter()]
+    [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.psm1'
+  )
+  $theme_name = ($git_ps_theme_url -split '/' | Select-Object -Last 1).Trim()
+  $local_theme = Get-ChildItem $ThemeSettings.MyThemesLocation | Where-Object { $_.Name -eq $theme_name } | Get-Content
+  $git_theme = Get-GitFile $git_ps_theme_url
+  if ($local_theme -ne $git_theme) {
+    Write-Information "Updating local theme content from github."
+    $git_theme | Out-File "$($ThemeSettings.MyThemesLocation)\$theme_name" -Force
+  }
+  Set-Theme (Get-Item "$($ThemeSettings.MyThemesLocation)\$theme_name").BaseName
+
+  # GitHub URLs where my files live
+  $git_theme = Get-GitFile $git_ps_theme_url
+  if ($local_theme -ne $git_theme) {
+    Write-Information "Updating local theme content from github."
+    $git_theme | Out-File "$($ThemeSettings.MyThemesLocation)\$theme_name" -Force
+  }
+  Set-Theme (Get-Item "$($ThemeSettings.MyThemesLocation)\$theme_name").BaseName
+
+  # Update local profile from github repo (if current does not match)
+  $git_ps_profile = Get-GitFile $git_ps_profile_url
+  $local_profile = Get-Content $profile -Raw
+  if ($local_profile -ne $git_ps_profile) {
+    Write-Information "Updating local profile from github."
+    $git_ps_profile | Out-File $profile -Force
   }
 }
 
@@ -95,10 +151,11 @@ Test-IsAdministrator
 $host.ui.RawUI.WindowTitle = "PowerShell [ $($script:elevation) |
  $(([regex]"\d+\.\d+.\d+").match($psversiontable.psversion).value) |
  $($psversiontable.psedition) |
- $env:username@$env:COMPUTERNAME.$env:USERDOMAIN ]"
+ $("$env:USERNAME@$env:COMPUTERNAME.$env:USERDOMAIN".ToLower()) ]"
 
 # Import all my modules
-Get-MyModules
+$my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
+$my_modules | Import-MyModules
 
 # Set ll and ls alias to use the new Get-ChildItemColor cmdlets
 Set-Alias ll Get-ChildItemColor -Option AllScope
