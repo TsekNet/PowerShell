@@ -94,7 +94,7 @@ begin {
       [Parameter()]
       [uri]$git_ps_profile_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1',
       [Parameter()]
-      [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.psm1'
+      [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.ps1'
     )
     $theme_name = ($git_ps_theme_url.AbsolutePath -split '/' | Select-Object -Last 1).Trim()
     $theme_path = "$($ThemeSettings.MyThemesLocation)"
