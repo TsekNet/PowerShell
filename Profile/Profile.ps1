@@ -115,10 +115,10 @@ begin {
     $git_theme = Get-GitFile $git_ps_theme_url.AbsoluteUri
     if ($local_theme -ne $git_theme) {
       Write-Warning "Pulled latest theme settings from GitHub."
-      $git_theme | Out-File "$theme_path\Fish.psm1" -Force
+      $git_theme | Out-File "$theme_path\$theme_name" -Force
     }
 
-    Set-Theme (Get-ChildItemColor "$theme_path\Fish.psm1")
+    Set-Theme (Get-ChildItemColor "$theme_path\$theme_name")
   }
 }
 
