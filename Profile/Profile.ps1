@@ -107,8 +107,8 @@ begin {
     $theme_name = ($git_ps_theme_url.AbsoluteUri -split '/' | Select-Object -Last 1).Trim()
     $theme_path = Get-ChildItem $ThemeSettings.MyThemesLocation | Where-Object { $_.Name -eq $theme_name } | Get-Content
 
-    if (-not(Test-Path -Path $theme_path)) {
-      New-Item -ItemType Directory $theme_path
+    if (-not(Test-Path -Path $ThemeSettings.MyThemesLocation)) {
+      New-Item -ItemType Directory $ThemeSettings.MyThemesLocation
     }
 
     $local_theme = Get-ChildItem $theme_path -Recurse | Where-Object { $_.Name -eq "Fish.psm1" } | Get-Content
