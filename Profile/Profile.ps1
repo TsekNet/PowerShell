@@ -107,18 +107,20 @@ begin {
     }
 
     $theme_name = ($git_ps_theme_url.AbsoluteUri -split '/' | Select-Object -Last 1).Trim()
-    $theme_path = $ThemeSettings.MyThemesLocation
+    $theme_path = Join-Path -Path "$($env:PSModulePath -split ';' | Select-Object -First 1)" -ChildPath "oh-my-posh\*.*.***\Themes" -Resolve
+
     if (-not(Test-Path -Path $theme_path)) {
       New-Item -ItemType Directory $theme_path
     }
-    $local_theme = Get-ChildItem $theme_path | Where-Object { $_.Name -eq $theme_name } | Get-Content
+
+    $local_theme = Get-ChildItem $theme_path -Recurse | Where-Object { $_.Name -eq "Fish.psm1" } | Get-Content
     $git_theme = Get-GitFile $git_ps_theme_url.AbsoluteUri
     if ($local_theme -ne $git_theme) {
       Write-Warning "Pulled latest theme settings from GitHub."
-      $git_theme | Out-File "$theme_path\$theme_name" -Force
+      $git_theme | Out-File "$theme_path\Fish.psm1" -Force
     }
 
-    Set-Theme (Get-Item "$theme_path\$theme_name").BaseName
+    Set-Theme (Get-ChildItemColor "$theme_path\Fish.psm1")
   }
 }
 
