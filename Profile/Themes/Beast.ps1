@@ -1,4 +1,4 @@
-﻿if (Get-Module posh-git) { return }
+﻿#Requires -Modules @{ ModuleName = 'posh-git' ; RequiredVersion = '0.7.3' }
 
 <#
 .Synopsis
