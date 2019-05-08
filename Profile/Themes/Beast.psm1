@@ -1,6 +1,4 @@
-﻿#Requires -Modules @{ ModuleName = 'posh-git' ; RequiredVersion = '0.7.3' }
-
-<#
+﻿<#
 .Synopsis
    Custom oh-my-posh theme built by @TsekNet.
 
