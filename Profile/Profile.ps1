@@ -94,9 +94,7 @@ begin {
       [Parameter()]
       [uri]$git_ps_profile_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1',
       [Parameter()]
-      [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.psm1',
-      [Parameter()]
-      [uri]$git_psd_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.psd1'
+      [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.psm1'
     )
     # Update local profile from github repo (if current does not match)
     $git_ps_profile = Get-GitFile $git_ps_profile_url.AbsoluteUri
@@ -107,20 +105,18 @@ begin {
     }
 
     $theme_name = ($git_ps_theme_url.AbsoluteUri -split '/' | Select-Object -Last 1).Trim()
-    $theme_path = Join-Path -Path "$($env:PSModulePath -split ';' | Select-Object -First 1)" -ChildPath "oh-my-posh\*.*.***\Themes" -Resolve
-
+    $theme_path = $ThemeSettings.MyThemesLocation
     if (-not(Test-Path -Path $theme_path)) {
       New-Item -ItemType Directory $theme_path
     }
-
-    $local_theme = Get-ChildItem $theme_path -Recurse | Where-Object { $_.Name -eq "Fish.psm1" } | Get-Content
+    $local_theme = Get-ChildItem $theme_path | Where-Object { $_.Name -eq $theme_name } | Get-Content
     $git_theme = Get-GitFile $git_ps_theme_url.AbsoluteUri
     if ($local_theme -ne $git_theme) {
       Write-Warning "Pulled latest theme settings from GitHub."
-      $git_theme | Out-File "$theme_path\Fish.psm1" -Force
+      $git_theme | Out-File "$theme_path\$theme_name" -Force
     }
 
-    Set-Theme (Get-ChildItemColor "$theme_path\Fish.psm1")
+    Set-Theme (Get-Item "$theme_path\$theme_name").BaseName
   }
 }
 
