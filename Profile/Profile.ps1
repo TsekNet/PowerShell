@@ -96,6 +96,15 @@ begin {
       [Parameter()]
       [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.ps1'
     )
+
+    # Update local profile from github repo (if current does not match)
+    $git_ps_profile = Get-GitFile $git_ps_profile_url.AbsoluteUri
+    $local_profile = Get-Content $profile.CurrentUserAllHosts -Raw
+    if ($local_profile -ne $git_ps_profile) {
+      Write-Warning "Pulled latest profile settings from GitHub."
+      $git_ps_profile | Out-File $profile.CurrentUserAllHosts -Force
+    }
+
     $theme_name = ($git_ps_theme_url.AbsolutePath -split '/' | Select-Object -Last 1).Trim()
     $theme_path = "$($ThemeSettings.MyThemesLocation)"
     if (-not(Test-Path -Path $theme_path)) {
@@ -107,15 +116,8 @@ begin {
       Write-Warning "Pulled latest theme settings from GitHub."
       $git_theme | Out-File "$theme_path\$theme_name" -Force
     }
-    Set-Theme (Get-Item "$theme_path\$theme_name").BaseName
 
-    # Update local profile from github repo (if current does not match)
-    $git_ps_profile = Get-GitFile $git_ps_profile_url.AbsoluteUri
-    $local_profile = Get-Content $profile.CurrentUserAllHosts -Raw
-    if ($local_profile -ne $git_ps_profile) {
-      Write-Warning "Pulled latest profile settings from GitHub."
-      $git_ps_profile | Out-File $profile.CurrentUserAllHosts -Force
-    }
+    Set-Theme (Get-Item "$theme_path\$theme_name").BaseName
   }
 }
 
