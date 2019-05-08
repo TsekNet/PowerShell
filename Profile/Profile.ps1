@@ -94,7 +94,7 @@ begin {
       [Parameter()]
       [uri]$git_ps_profile_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1',
       [Parameter()]
-      [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.ps1'
+      [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.psm1'
     )
 
     # Update local profile from github repo (if current does not match)
@@ -105,8 +105,8 @@ begin {
       $git_ps_profile | Out-File $profile.CurrentUserAllHosts -Force
     }
 
-    $theme_name = ($git_ps_theme_url.AbsolutePath -split '/' | Select-Object -Last 1).Trim()
-    $theme_path = "$($ThemeSettings.MyThemesLocation)"
+    $theme_name = ($git_ps_theme_url.AbsoluteUri -split '/' | Select-Object -Last 1).Trim()
+    $theme_path = $ThemeSettings.MyThemesLocation
     if (-not(Test-Path -Path $theme_path)) {
       New-Item -ItemType Directory $theme_path
     }
