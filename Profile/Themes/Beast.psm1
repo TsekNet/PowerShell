@@ -1,4 +1,4 @@
-﻿#requires -Version 2 -Modules posh-git
+﻿#Requires -Version 2 -Modules posh-git
 
 <#
 .Synopsis
