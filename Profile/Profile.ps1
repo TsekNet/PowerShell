@@ -94,7 +94,7 @@ begin {
       [Parameter()]
       [uri]$git_ps_profile_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1',
       [Parameter()]
-      [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Beast.psm1'
+      [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Fish.psm1'
     )
     # Update local profile from github repo (if current does not match)
     $git_ps_profile = Get-GitFile $git_ps_profile_url.AbsoluteUri
