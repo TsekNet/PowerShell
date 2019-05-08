@@ -96,7 +96,7 @@ begin {
       [Parameter()]
       [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Fish.psm1'
     )
-    # Update local profile from github repo (if current does not match)
+    Update local profile from github repo (if current does not match)
     $git_ps_profile = Get-GitFile $git_ps_profile_url.AbsoluteUri
     $local_profile = Get-Content $profile.CurrentUserAllHosts -Raw
     if ($local_profile -ne $git_ps_profile) {
@@ -105,72 +105,73 @@ begin {
     }
 
     $theme_name = ($git_ps_theme_url.AbsoluteUri -split '/' | Select-Object -Last 1).Trim()
-    $theme_path = Get-ChildItem $ThemeSettings.MyThemesLocation | Where-Object { $_.Name -eq $theme_name } | Get-Content
+    $theme_name = 'Fish.psm1'
+    $theme_path = Join-Path -Path "$($env:PSModulePath -split ';' | Select-Object -First 1)" -ChildPath "oh-my-posh\*.*.***\Themes" -Resolve
+    $theme_name_path = "$theme_path\$theme_name"
 
-    if (-not(Test-Path -Path $ThemeSettings.MyThemesLocation)) {
-      New-Item -ItemType Directory $ThemeSettings.MyThemesLocation
+    if (-not(Test-Path -Path $theme_name_path)) {
+      New-Item -ItemType Directory $theme_name_path
+
+      $local_theme = Get-ChildItem $theme_name_path -Recurse | Where-Object { $_.Name -eq $theme_name } | Get-Content
+      $git_theme = Get-GitFile $git_ps_theme_url.AbsoluteUri
+      if ($local_theme -ne $git_theme) {
+        Write-Warning "Pulled latest theme settings from GitHub."
+        Copy-Item $git_theme -Destination $theme_name_path -Force
+      }
+
+      Write-Verbose "Setting theme to "
+      Set-Theme Fish
     }
-
-    $local_theme = Get-ChildItem $theme_path -Recurse | Where-Object { $_.Name -eq "Fish.psm1" } | Get-Content
-    $git_theme = Get-GitFile $git_ps_theme_url.AbsoluteUri
-    if ($local_theme -ne $git_theme) {
-      Write-Warning "Pulled latest theme settings from GitHub."
-      $git_theme | Out-File "$($ThemeSettings.MyThemesLocation)\$theme_name" -Force
-    }
-
-    Write-Verbose "Setting theme to "
-    Set-Theme (Get-Item "$($ThemeSettings.MyThemesLocation)\$theme_name").BaseName
   }
-}
 
-#endregion
+  #endregion
 
-#region statements
+  #region statements
 
-process {
-  # If it's Windows PowerShell, we can turn on Verbose output if you're holding shift
-  if ("Desktop" -eq $PSVersionTable.PSEdition) {
-    # Check SHIFT state ASAP at startup so I can use that to control verbosity :)
-    Add-Type -Assembly PresentationCore, WindowsBase
-    try {
-      if ([System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::LeftShift) -OR
-        [System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::RightShift)) {
-        $VerbosePreference = "Continue"
+  process {
+    # If it's Windows PowerShell, we can turn on Verbose output if you're holding shift
+    if ("Desktop" -eq $PSVersionTable.PSEdition) {
+      # Check SHIFT state ASAP at startup so I can use that to control verbosity :)
+      Add-Type -Assembly PresentationCore, WindowsBase
+      try {
+        if ([System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::LeftShift) -OR
+          [System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::RightShift)) {
+          $VerbosePreference = "Continue"
+        }
+      }
+      catch {
+        # If that didn't work ... oh well.
       }
     }
-    catch {
-      # If that didn't work ... oh well.
-    }
   }
-}
 
-#endregion
+  #endregion
 
-#region execution
+  #region execution
 
-end {
-  # Admin verification is used for the title window
-  Test-IsAdministrator
+  end {
+    # Admin verification is used for the title window
+    Test-IsAdministrator
 
-  # Set the Window Title
-  $host.ui.RawUI.WindowTitle = "PowerShell [ $($script:elevation) |
+    # Set the Window Title
+    $host.ui.RawUI.WindowTitle = "PowerShell [ $($script:elevation) |
  $(([regex]"\d+\.\d+.\d+").match($psversiontable.psversion).value) |
  $($psversiontable.psedition) |
  $("$env:USERNAME@$env:COMPUTERNAME.$env:USERDOMAIN".ToLower()) ]"
 
-  # Import all my modules
-  $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
-  $my_modules | Import-MyModules
+    # Import all my modules
+    $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
+    $my_modules | Import-MyModules
 
-  # Set ll and ls alias to use the new Get-ChildItemColor cmdlets
-  Set-Alias ll Get-ChildItemColor -Option AllScope
-  Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
+    # Set ll and ls alias to use the new Get-ChildItemColor cmdlets
+    Set-Alias ll Get-ChildItemColor -Option AllScope
+    Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
-  # Set the oh-my-posh theme
-  Set-MyTheme
+    # Set the oh-my-posh theme
+    Set-MyTheme
 
-  # Set the current directory to the one set in the function above
-  Set-Path
-}
+    # Set the current directory to the one set in the function above
+    Set-Path
+  }
 
-#endregion
+  #endregion
