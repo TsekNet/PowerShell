@@ -1,25 +1,5 @@
 ﻿#requires -Version 2 -Modules posh-git
 
-<#
-.Synopsis
-   Custom oh-my-posh theme built by @TsekNet.
-
-.DESCRIPTION
-   This module is a custom theme built using the oh-my-posh PowerLine module.
-   You should be able to just run Set-Theme Beast if you've already got
-   oh-my-posh installed. If not, you will get errors, but you will be able to
-   run this module seperately with a few modfiications (mainly removing any
-   module specific variables.)
-
-.NOTES
-   This is considered in progress and if you see any issues, feel free to submit
-   a pull request.
-
-.FUNCTIONALITY
-   This theme can be loaded using oh-my-posh module and running the Set-Theme
-   Beast command.
-#>
-
 function Get-Elapsed {
   <#
     .Synopsis
