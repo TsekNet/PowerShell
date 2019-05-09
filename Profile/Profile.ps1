@@ -49,8 +49,7 @@ begin {
     process {
       try {
         Import-Module -Name $Name -ErrorAction Stop
-      }
-      catch {
+      } catch {
         $lookup = Find-Module -Name $Name
         if (-not $lookup) {
           Write-Error "Module `"$Name`" not found."
@@ -66,44 +65,40 @@ begin {
   function Test-IsAdministrator {
     if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
       $script:elevation = "Admin"
-    }
-    else {
+    } else {
       $script:elevation = "Non-Admin"
     }
   }
 
-  # Download a file from GitHub
-  function Get-GitFile {
-    [CmdletBinding()]
-    param (
-      [Parameter(Mandatory, ValueFromPipeline)]
-      [ValidatePattern('https://raw\.githubusercontent\.com.*')]
-      [string]
-      $URL
-    )
-
-    process {
-      return (Invoke-WebRequest -Uri $URL).Content
+  # Helper function to set the window title
+  function Set-WindowTitle {
+    $host_title = @{
+      'Elevation' = $(if (Test-IsAdministrator) { "Admin" } else { "Non-Admin" })
+      'Version'   = $PSVersionTable.PSVersion
+      'Edition'   = $PSVersionTable.PSEdition
+      'Session'   = "$env:USERNAME@$env:COMPUTERNAME.$env:USERDOMAIN".ToLower()
     }
+
+    $host.ui.RawUI.WindowTitle = "PowerShell [ $($host_title.Values -join ' | ') ]"
   }
 
   # Download Profile/Theme and set them<#
   function Get-GithubRepository {
     <#
-.Synopsis
-   This function will download a Github Repository without using Git
-.DESCRIPTION
-   This function will download files from Github without using Git.  You will need to know the Owner, Repository name, branch (default master),
-   and FilePath.  The Filepath will include any folders and files that you want to download.
-.EXAMPLE
-   Get-GithubRepository -Owner MSAdministrator -Repository WriteLogEntry -Verbose -FilePath `
+  .Synopsis
+    This function will download a Github Repository without using Git
+  .DESCRIPTION
+    This function will download files from Github without using Git.  You will need to know the Owner, Repository name, branch (default master),
+    and FilePath.  The Filepath will include any folders and files that you want to download.
+  .EXAMPLE
+    Get-GithubRepository -Owner MSAdministrator -Repository WriteLogEntry -Verbose -FilePath `
         'WriteLogEntry.psm1',
         'WriteLogEntry.psd1',
         'Public',
         'en-US',
         'en-US\about_WriteLogEntry.help.txt',
         'Public\Write-LogEntry.ps1'
-#>
+  #>
     [CmdletBinding()]
     [Alias()]
     [OutputType([int])]
@@ -133,37 +128,37 @@ begin {
     Begin {
       $modulespath = ($env:psmodulepath -split ";")[0]
       $PowerShellModule = "$modulespath\$Repository"
-      Write-Verbose "Creating module directory"
-      New-Item -Type Container -Force -Path $PowerShellModule | out-null
-      Write-Verbose "Downloading and installing"
+      if (-not(Test-Path $PowerShellModule)) {
+        Write-Verbose "Creating module directory"
+        New-Item -Type Container -Force -Path $PowerShellModule | Out-Null
+      }
       $wc = New-Object System.Net.WebClient
       $wc.Encoding = [System.Text.Encoding]::UTF8
     }
     Process {
       foreach ($item in $FilePath) {
-        Write-Verbose -Message "$item in FilePath"
         if ($item -like '*.*') {
           $url = "https://raw.githubusercontent.com/$Owner/$Repository/$Branch/$item"
-          Write-Verbose -Message "Attempting to download from $url"
+          Write-Verbose -Message "Attempting to download from '$url'"
           if ($item -like "*$ThemeName.psm1") {
-            $poshpath = Join-Path -Path "$($env:PSModulePath -split ';' | Select-Object -First 1)" -ChildPath "oh-my-posh\*.*.***\Themes" -Resolve
-            $fullpath = $poshpath + '\' + $ThemeName + '.psm1'
+            Write-Verbose -Message "'$item' Theme found in FilePath"
+            # $poshpath = Join-Path -Path "$($env:PSModulePath -split ';' | Select-Object -First 1)" -ChildPath "oh-my-posh\*.*.***\Themes" -Resolve
+            $fullpath = "$($ThemeSettings.MyThemesLocation)\$ThemeName.psm1"
 
-            Write-Verbose -Message "Attempting to create $fullpath"
+            Write-Verbose -Message "Created file '$fullpath'"
             if (-not(Test-Path $fullpath)) {
               New-Item -ItemType File -Force -Path $fullpath | Out-Null
             }
             ($wc.DownloadString("$url")) | Out-File $fullpath
-          }
-          else {
-            Write-Verbose -Message "Attempting to create $PowerShellModule\$item"
+          } else {
+            Write-Verbose -Message "'$item' found in FilePath"
             New-Item -ItemType File -Force -Path "$PowerShellModule\$item" | Out-Null
+            Write-Verbose -Message "Created file '$PowerShellModule\$item'"
             ($wc.DownloadString("$url")) | Out-File "$PowerShellModule\$item"
           }
-        }
-        else {
-          Write-Verbose -Message "Attempting to create $PowerShellModule\$item"
+        } else {
           New-Item -ItemType Container -Force -Path "$PowerShellModule\$item" | Out-Null
+          Write-Verbose -Message "Created file '$PowerShellModule\$item'"
           $url = "https://raw.githubusercontent.com/$Owner/$Repository/$Branch/$item"
           Write-Verbose -Message "Attempting to download from $url"
         }
@@ -188,8 +183,7 @@ process {
         [System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::RightShift)) {
         $VerbosePreference = "Continue"
       }
-    }
-    catch {
+    } catch {
       # If that didn't work ... oh well.
     }
   }
@@ -204,10 +198,7 @@ end {
   Test-IsAdministrator
 
   # Set the Window Title
-  $host.ui.RawUI.WindowTitle = "PowerShell [ $($script:elevation) |
- $(([regex]"\d+\.\d+.\d+").match($psversiontable.psversion).value) |
- $($psversiontable.psedition) |
- $("$env:USERNAME@$env:COMPUTERNAME.$env:USERDOMAIN".ToLower()) ]"
+  Set-WindowTitle
 
   # Import all my modules
   $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
@@ -217,10 +208,13 @@ end {
   Set-Alias ll Get-ChildItemColor -Option AllScope
   Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
-  # Set the oh-my-posh theme
+  # Downloaded latest files from GitHub
   Get-GithubRepository -Owner tseknet -Repository PowerShell -FilePath `
     'Profile/Profile.ps1',
-  'Profile/Themes/Fish.psm1' -ThemeName 'Fish' -Verbose
+  'Profile/Themes/Beast.psm1' -ThemeName 'Beast'
+
+  # Set Theme
+  Set-Theme Beast
 
   # Set the current directory to the one set in the function above
   Set-Path
