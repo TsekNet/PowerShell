@@ -1,4 +1,6 @@
-﻿<#
+﻿#requires -Version 5 -Modules posh-git
+
+<#
 .Synopsis
    Custom oh-my-posh theme built by @TsekNet.
 
@@ -17,13 +19,6 @@
    This theme can be loaded using oh-my-posh module and running the Set-Theme
    Beast command.
 #>
-
-if (Get-Module -ListAvailable -Name posh-git) {
-  Import-Module posh-git
-}
-else {
-  Write-Error "Module posh-git not found!"
-}
 
 function Get-Elapsed {
   <#
