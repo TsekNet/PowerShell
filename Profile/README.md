@@ -34,11 +34,9 @@ Get-ChildItemColor
 
 ### Installing
 
-1. Download files in this repo
-2. Place the profile.ps1 in your preffered $profile location
-3. Install the required modules listed above
-4. Copy Beast.ps1 into the oh-my-posh themes directory
-5. Restart PowerShell
+1. Download profile.ps1 from this repo
+2. Copy profile.ps1 in $profile.CurrentUserAllHosts
+3. Restart PowerShell or run `& $profile.CurrentUserAllHosts`
 
 *NOTE* If you run into any errors, $Error[0] will have the latest error
 message for troubleshooting.
