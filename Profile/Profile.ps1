@@ -82,7 +82,7 @@ begin {
     $host.ui.RawUI.WindowTitle = "PowerShell [ $($host_title.Values -join ' | ') ]"
   }
 
-  # Download Profile/Theme and set them<#
+  # Download Files from Github
   function Get-GithubRepository {
     <#
   .Synopsis
@@ -104,38 +104,48 @@ begin {
     [OutputType([int])]
     Param
     (
-      # Please provide the repository owner
+      # Repository owner
       [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 0)]
       [string]$Owner,
 
-      # Please provide the name of the repository
+      # Name of the repository
       [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 1)]
       [string]$Repository,
 
-      # Please provide a branch to download from
+      # Branch to download from
       [Parameter(ValueFromPipelineByPropertyName, Position = 2)]
       [string]$Branch = 'master',
 
-      # Please provide a list of files/paths to download
+      # List of files/paths to download
       [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 3)]
       [string[]]$FilePath,
 
-      # Please provide a list of files/paths to download
+      # List of posh-git themes to download
       [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 4)]
-      [string[]]$ThemeName
+      [string[]]$ThemeName,
+
+      # List of posh-git themes to download
+      [Parameter(ValueFromPipelineByPropertyName, Position = 5)]
+      [string]$ProfileFile = $profile.CurrentUserAllHosts
     )
 
     Begin {
       $modulespath = ($env:psmodulepath -split ";")[0]
       $PowerShellModule = "$modulespath\$Repository"
-      if (-not(Test-Path $PowerShellModule)) {
-        Write-Verbose "Creating module directory"
-        New-Item -Type Container -Force -Path $PowerShellModule | Out-Null
-      }
       $wc = New-Object System.Net.WebClient
       $wc.Encoding = [System.Text.Encoding]::UTF8
     }
     Process {
+      if (-not(Test-Path $PowerShellModule)) {
+        Write-Verbose "Creating module directory"
+        New-Item -Type Container -Path $PowerShellModule -Force | Out-Null
+      }
+
+      if (-not(Test-Path $ProfileFile)) {
+        Write-Verbose "Creating profile"
+        New-Item -Path $ProfileFile -Force | Out-Null
+      }
+
       foreach ($item in $FilePath) {
         if ($item -like '*.*') {
           $url = "https://raw.githubusercontent.com/$Owner/$Repository/$Branch/$item"
@@ -150,6 +160,11 @@ begin {
               New-Item -ItemType File -Force -Path $fullpath | Out-Null
             }
             ($wc.DownloadString("$url")) | Out-File $fullpath
+          } elseif ($item -like '*profile.ps1') {
+            Write-Verbose -Message "'$item' Profile found in FilePath"
+            New-Item -ItemType File -Force -Path $ProfileFile | Out-Null
+            Write-Verbose -Message "Created file '$ProfileFile'"
+            ($wc.DownloadString("$url")) | Out-File "$ProfileFile"
           } else {
             Write-Verbose -Message "'$item' found in FilePath"
             New-Item -ItemType File -Force -Path "$PowerShellModule\$item" | Out-Null
