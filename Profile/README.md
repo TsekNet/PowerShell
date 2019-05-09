@@ -35,7 +35,7 @@ Get-ChildItemColor
 ### Installing
 
 1. Download profile.ps1 from this repo
-2. Copy profile.ps1 in $profile.CurrentUserAllHosts
+2. Copy profile.ps1 in `$profile.CurrentUserAllHosts`
 3. Restart PowerShell or run `& $profile.CurrentUserAllHosts`
 
 *NOTE* If you run into any errors, $Error[0] will have the latest error
