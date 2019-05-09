@@ -87,40 +87,89 @@ begin {
     }
   }
 
-  # Download Profile/Theme and set them
-  function Set-MyTheme {
-    [CmdletBinding(SupportsShouldProcess)]
-    param (
-      [Parameter()]
-      [uri]$git_ps_profile_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1',
-      [Parameter()]
-      [uri]$git_ps_theme_url = 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Themes/Fish.psm1'
+  # Download Profile/Theme and set them<#
+  function Get-GithubRepository {
+    <#
+.Synopsis
+   This function will download a Github Repository without using Git
+.DESCRIPTION
+   This function will download files from Github without using Git.  You will need to know the Owner, Repository name, branch (default master),
+   and FilePath.  The Filepath will include any folders and files that you want to download.
+.EXAMPLE
+   Get-GithubRepository -Owner MSAdministrator -Repository WriteLogEntry -Verbose -FilePath `
+        'WriteLogEntry.psm1',
+        'WriteLogEntry.psd1',
+        'Public',
+        'en-US',
+        'en-US\about_WriteLogEntry.help.txt',
+        'Public\Write-LogEntry.ps1'
+#>
+    [CmdletBinding()]
+    [Alias()]
+    [OutputType([int])]
+    Param
+    (
+      # Please provide the repository owner
+      [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 0)]
+      [string]$Owner,
+
+      # Please provide the name of the repository
+      [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 1)]
+      [string]$Repository,
+
+      # Please provide a branch to download from
+      [Parameter(ValueFromPipelineByPropertyName, Position = 2)]
+      [string]$Branch = 'master',
+
+      # Please provide a list of files/paths to download
+      [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 3)]
+      [string[]]$FilePath,
+
+      # Please provide a list of files/paths to download
+      [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 4)]
+      [string[]]$ThemeName
     )
-    # Update local profile from github repo (if current does not match)
-    $git_ps_profile = Get-GitFile $git_ps_profile_url.AbsoluteUri
-    $local_profile = Get-Content $profile.CurrentUserAllHosts -Raw
-    if ($local_profile -ne $git_ps_profile) {
-      Write-Warning "Pulled latest profile settings from GitHub."
-      $git_ps_profile | Out-File $profile.CurrentUserAllHosts -Force
+
+    Begin {
+      $modulespath = ($env:psmodulepath -split ";")[0]
+      $PowerShellModule = "$modulespath\$Repository"
+      Write-Verbose "Creating module directory"
+      New-Item -Type Container -Force -Path $PowerShellModule | out-null
+      Write-Verbose "Downloading and installing"
+      $wc = New-Object System.Net.WebClient
+      $wc.Encoding = [System.Text.Encoding]::UTF8
     }
+    Process {
+      foreach ($item in $FilePath) {
+        Write-Verbose -Message "$item in FilePath"
+        if ($item -like '*.*') {
+          $url = "https://raw.githubusercontent.com/$Owner/$Repository/$Branch/$item"
+          Write-Verbose -Message "Attempting to download from $url"
+          if ($item -like "*$ThemeName.psm1") {
+            $poshpath = Join-Path -Path "$($env:PSModulePath -split ';' | Select-Object -First 1)" -ChildPath "oh-my-posh\*.*.***\Themes" -Resolve
+            $fullpath = $poshpath + '\' + $ThemeName + '.psm1'
 
-    $theme_name = ($git_ps_theme_url.AbsoluteUri -split '/' | Select-Object -Last 1).Trim()
-    $theme_name = 'Fish.psm1'
-    $theme_path = Join-Path -Path "$($env:PSModulePath -split ';' | Select-Object -First 1)" -ChildPath "oh-my-posh\*.*.***\Themes" -Resolve
-    $theme_name_path = "$theme_path\$theme_name"
-
-    if (-not(Test-Path -Path $theme_name_path)) {
-      New-Item -ItemType Directory $theme_name_path
-
-      $local_theme = Get-ChildItem $theme_name_path -Recurse | Where-Object { $_.Name -eq $theme_name } | Get-Content
-      $git_theme = Get-GitFile $git_ps_theme_url.AbsoluteUri
-      if ($local_theme -ne $git_theme) {
-        Write-Warning "Pulled latest theme settings from GitHub."
-        $git_theme | Out-File $theme_name_path  -Force
+            Write-Verbose -Message "Attempting to create $fullpath"
+            if (-not(Test-Path $fullpath)) {
+              New-Item -ItemType File -Force -Path $fullpath | Out-Null
+            }
+            ($wc.DownloadString("$url")) | Out-File $fullpath
+          }
+          else {
+            Write-Verbose -Message "Attempting to create $PowerShellModule\$item"
+            New-Item -ItemType File -Force -Path "$PowerShellModule\$item" | Out-Null
+            ($wc.DownloadString("$url")) | Out-File "$PowerShellModule\$item"
+          }
+        }
+        else {
+          Write-Verbose -Message "Attempting to create $PowerShellModule\$item"
+          New-Item -ItemType Container -Force -Path "$PowerShellModule\$item" | Out-Null
+          $url = "https://raw.githubusercontent.com/$Owner/$Repository/$Branch/$item"
+          Write-Verbose -Message "Attempting to download from $url"
+        }
       }
-
-      Write-Verbose "Setting theme to "
-      Set-Theme Fish
+    }
+    End {
     }
   }
 }
@@ -169,7 +218,9 @@ end {
   Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
   # Set the oh-my-posh theme
-  Set-Theme Fish
+  Get-GithubRepository -Owner tseknet -Repository PowerShell -FilePath `
+    'Profile/Profile.ps1',
+  'Profile/Themes/Fish.psm1' -ThemeName 'Fish' -Verbose
 
   # Set the current directory to the one set in the function above
   Set-Path
