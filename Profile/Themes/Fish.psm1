@@ -1,6 +1,4 @@
-﻿#requires -Version 5 -Modules posh-git
-
-<#
+﻿<#
 .Synopsis
    Custom oh-my-posh theme built by @TsekNet.
 
