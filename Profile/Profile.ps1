@@ -116,7 +116,7 @@ begin {
       $git_theme = Get-GitFile $git_ps_theme_url.AbsoluteUri
       if ($local_theme -ne $git_theme) {
         Write-Warning "Pulled latest theme settings from GitHub."
-        Copy-Item $git_theme -Destination $theme_name_path -Force
+        $git_theme | Out-File $theme_name_path  -Force
       }
 
       Write-Verbose "Setting theme to "
@@ -169,7 +169,7 @@ end {
   Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
   # Set the oh-my-posh theme
-  Set-MyTheme
+  Set-Theme Fish
 
   # Set the current directory to the one set in the function above
   Set-Path
