@@ -44,6 +44,14 @@ oh-my-posh
 Get-ChildItemColor
 ```
 
+## What's included
+
+1. Set the PowerShell Window Title with useful information such as elevation and version.
+1. Install/Import modules listed above.
+1. Overwrite ll / ls commands with Get-ChildItemColor for better output
+1. Download/Set personal theme [Beast.psm1](Themes/Beast.psm1)
+1. Set default path
+
 ## Troubleshooting
 
 If you run into any errors, $Error[0] will have the latest error message for troubleshooting.
