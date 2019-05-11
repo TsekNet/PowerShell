@@ -239,7 +239,7 @@ end {
   Set-Theme TsekNet
 
   # Set the current directory to the one set in the function above
-  Set-Path -Path 'C:\Tsmp'
+  Set-Path -Path 'C:\Tmp'
 }
 
 #endregion
