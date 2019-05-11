@@ -159,7 +159,6 @@ begin {
           Write-Verbose -Message "Attempting to download from '$url'"
           if ($item -like "*$ThemeName.psm1") {
             Write-Verbose -Message "'$item' Theme found in FilePath"
-            # $poshpath = Join-Path -Path "$($env:PSModulePath -split ';' | Select-Object -First 1)" -ChildPath "oh-my-posh\*.*.***\Themes" -Resolve
             $fullpath = "$($ThemeSettings.MyThemesLocation)\$ThemeName.psm1"
 
             Write-Verbose -Message "Created file '$fullpath'"
