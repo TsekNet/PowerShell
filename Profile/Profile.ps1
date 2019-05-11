@@ -233,10 +233,10 @@ end {
   # Downloaded latest files from GitHub
   Get-GithubRepository -Owner tseknet -Repository PowerShell -FilePath `
     'Profile/Profile.ps1',
-  'Profile/Themes/Beast.psm1' -ThemeName 'Beast'
+  'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 
   # Set Theme
-  Set-Theme Beast
+  Set-Theme TsekNet
 
   # Set the current directory to the one set in the function above
   Set-Path -Path 'C:\Tsmp'
