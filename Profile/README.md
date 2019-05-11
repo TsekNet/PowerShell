@@ -1,8 +1,8 @@
-﻿# TsekNet's Profile
+# TsekNet's Profile
 
-My heavily customized PowerShell profile. Feel free to use and distrubute as
-you see fit. Always improving this, if you catch any errors, or see where I
-can improve this, please let me know!
+Please see below my heavily customized PowerShell profile. Feel free to use and distrubute it as
+you see fit. I am always improving this, so if you catch any errors, or see where I
+can improve, please let me know!
 
 To use this profile, simply place this file in any of your $profile
 directories and restart your PowerShell console
@@ -34,9 +34,13 @@ Get-ChildItemColor
 
 ### Installation
 
-1. Download profile.ps1 from this repo
-2. Copy profile.ps1 to `$profile.CurrentUserAllHosts`
-3. Restart PowerShell or run `& $profile.CurrentUserAllHosts`
+1. Copy the following into a PowerShell prompt:
+
+```powershell
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1" -OutFile $profile.CurrentUserAllHosts -TimeoutSec 30
+```
+
+2. Restart PowerShell (or run ```powershell & $profile.CurrentUserAllHosts```)
 
 *NOTE* If you run into any errors, $Error[0] will have the latest error
 message for troubleshooting.
@@ -47,7 +51,7 @@ Feel free to submit a pull request if you see any issues.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
 
 ## Acknowledgments
 
