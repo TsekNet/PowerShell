@@ -22,16 +22,6 @@ PowerShell running in a non-admin window while working on a git repo
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Prerequisites
-
-The following modules are required:
-
-```powershell {.good}
-posh-git
-oh-my-posh
-Get-ChildItemColor
-```
-
 ### Installation
 
 1. Copy the following into a PowerShell prompt:
@@ -44,6 +34,16 @@ Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/tseknet/PowerShell/mas
 
 *NOTE* If you run into any errors, $Error[0] will have the latest error
 message for troubleshooting.
+
+### Imported Modules
+
+The following modules will be installed by default:
+
+```powershell {.good}
+posh-git
+oh-my-posh
+Get-ChildItemColor
+```
 
 ## Contributing
 
