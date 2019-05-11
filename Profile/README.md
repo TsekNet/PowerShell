@@ -1,6 +1,6 @@
 # TsekNet's Profile
 
-Please see below my heavily customized PowerShell profile. Feel free to use and distrubute it as
+My personal, heavily customized PowerShell profile. Feel free to use and distrubute it as
 you see fit. I am always improving this, so if you catch any errors, or see where I
 can improve, please let me know!
 
