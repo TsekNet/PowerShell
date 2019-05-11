@@ -22,10 +22,17 @@
 begin {
   # Helper function to change directory to my development workspace
   function Set-Path {
-    $Path = 'C:\Tmp\'
-    if (-not (Test-Path -Path $Path)) {
-      New-Item -ItemType Directory -Force -Path $Path
-    }
+    [CmdletBinding()]
+    Param(
+      [ValidateScript( {
+          if (-Not ($_ | Test-Path) ) {
+            Write-Verbose "Creating default location $_"
+            New-Item -ItemType Directory -Force -Path $_
+          }
+          return $true
+        })]
+      [System.IO.FileInfo]$Path
+    )
     Set-Location $Path
   }
 
@@ -232,7 +239,7 @@ end {
   Set-Theme Beast
 
   # Set the current directory to the one set in the function above
-  Set-Path
+  Set-Path -Path 'C:\Tsmp'
 }
 
 #endregion
