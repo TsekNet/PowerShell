@@ -32,8 +32,7 @@ Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/tseknet/PowerShell/mas
 
 2. Restart PowerShell (or run ```powershell & $profile.CurrentUserAllHosts```)
 
-*NOTE* If you run into any errors, $Error[0] will have the latest error
-message for troubleshooting.
+*NOTE* When running this for the first time, the startup will be slower, as it is installing all the required modules.
 
 ### Imported Modules
 
@@ -44,6 +43,10 @@ posh-git
 oh-my-posh
 Get-ChildItemColor
 ```
+
+## Troubleshooting
+
+If you run into any errors, $Error[0] will have the latest error message for troubleshooting.
 
 ## Contributing
 
