@@ -90,7 +90,7 @@ begin {
   }
 
   # Download Files from Github
-  function Get-GithubRepository {
+  function Import-GitRepo {
     <#
   .Synopsis
     This function will download a Github Repository without using Git
@@ -98,7 +98,7 @@ begin {
     This function will download files from Github without using Git.  You will need to know the Owner, Repository name, branch (default master),
     and FilePath.  The Filepath will include any folders and files that you want to download.
   .EXAMPLE
-    Get-GithubRepository -Owner MSAdministrator -Repository WriteLogEntry -Verbose -FilePath `
+    Import-GitRepo -Owner MSAdministrator -Repository WriteLogEntry -Verbose -FilePath `
         'WriteLogEntry.psm1',
         'WriteLogEntry.psd1',
         'Public',
@@ -231,7 +231,7 @@ end {
   Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
   # Downloaded latest files from GitHub
-  Get-GithubRepository -Owner tseknet -Repository PowerShell -FilePath `
+  Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
     'Profile/Profile.ps1',
   'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 

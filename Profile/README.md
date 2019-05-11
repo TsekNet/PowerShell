@@ -30,7 +30,7 @@ These instructions will get you a copy of the project up and running on your loc
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1' -OutFile $profile.CurrentUserAllHosts -TimeoutSec 30
 ```
 
-2. Restart PowerShell (or run ```powershell & $profile.CurrentUserAllHosts```)
+1. Restart PowerShell (or run ```powershell & $profile.CurrentUserAllHosts```)
 
 *NOTE* When running this for the first time, the startup will be slower, as it is installing all the required modules.
 
