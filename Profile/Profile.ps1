@@ -199,15 +199,16 @@ begin {
       [String]$TranscriptName = "PSTranscript-$(Get-Date -Format yyyyMMdd).log"
     )
 
-    $fullPath = "$TranscriptDir\$TranscriptName"
-    if ($fullPath) {
-      Start-Transcript -Path $fullPath -Append | Out-Null
+    $transcriptPath = "$TranscriptDir\$TranscriptName"
+    if ($transcriptPath) {
+      Start-Transcript -Path $transcriptPath -Append | Out-Null
     } else {
       New-Item -ItemType Directory -Path $TranscriptDir -Force | Out-Null
-      Start-Transcript -Path $fullPath | Out-Null
+      Start-Transcript -Path $transcriptPath | Out-Null
     }
 
-    Write-Host "PowerShell commands are being logged to: '$fullPath'" -ForegroundColor Green
+    Write-Host 'PowerShell commands are being logged to: ' -ForegroundColor Green
+    Write-Host $transcriptPath -ForegroundColor Green
   }
 }
 
