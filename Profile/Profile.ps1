@@ -289,7 +289,7 @@ end {
   Set-WindowTitle
 
   # Get a random quote from Wikipedia
-  Get-Random "Genius", "Love", "Success", "Failure", "Intelligence" | Get-Quote
+  Get-Random 'Genius', 'Love', 'Success', 'Failure', 'Intelligence' | Get-Quote
 
   # Import all my modules
   $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
