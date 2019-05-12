@@ -207,7 +207,7 @@ begin {
       Start-Transcript -Path $TranscriptPath | Out-Null
     }
 
-    Write-Host "PS LogDir: $TranscriptPath" -ForegroundColor Gray
+    Write-Host "TranscriptPath: $TranscriptPath" -ForegroundColor Gray
   }
 }
 
