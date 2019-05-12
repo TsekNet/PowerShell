@@ -235,11 +235,6 @@ process {
 #region execution
 
 end {
-  # Downloaded latest files from GitHub
-  Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
-    'Profile/Profile.ps1',
-  'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
-
   # Log all PowerShell Output to file
   Start-TranscriptLog
 
@@ -252,6 +247,11 @@ end {
   # Import all my modules
   $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
   $my_modules | Import-MyModules
+
+  # Downloaded latest files from GitHub
+  Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
+    'Profile/Profile.ps1',
+  'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 
   # Set ll and ls alias to use the new Get-ChildItemColor cmdlets
   Set-Alias ll Get-ChildItemColor -Option AllScope
