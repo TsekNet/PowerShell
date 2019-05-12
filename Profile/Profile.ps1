@@ -198,15 +198,16 @@ begin {
       [String]$TranscriptName = "$(Get-Date -Format dd-MM-yyyy).log"
     )
 
-    $transcriptPath = "$TranscriptDir\$TranscriptName"
-    if ($transcriptPath) {
-      Start-Transcript -Path $transcriptPath -Append | Out-Null
+    # Make variable available at all times
+    $global:TranscriptPath = "$TranscriptDir\$TranscriptName"
+    if ($TranscriptPath) {
+      Start-Transcript -Path $TranscriptPath -Append | Out-Null
     } else {
       New-Item -ItemType Directory -Path $TranscriptDir -Force | Out-Null
-      Start-Transcript -Path $transcriptPath | Out-Null
+      Start-Transcript -Path $TranscriptPath | Out-Null
     }
 
-    Write-Host "PS LogDir: $transcriptPath" -ForegroundColor Gray
+    Write-Host "PS LogDir: $TranscriptPath" -ForegroundColor Gray
   }
 }
 
