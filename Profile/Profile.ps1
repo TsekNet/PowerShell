@@ -195,7 +195,7 @@ begin {
     Param (
       [System.IO.FileInfo]$TranscriptDir = "$(Get-ChildItem $profile.CurrentUserAllHosts |
     Select-Object -ExpandProperty Directory)\Transcripts\$(Get-Date -Format yyyy)\$(Get-Date -UFormat %B)",
-      [String]$TranscriptName = "PSTranscript-$(Get-Date -Format yyyyMMdd).log"
+      [String]$TranscriptName = "$(Get-Date -Format dd-MM-yyyy).log"
     )
 
     $transcriptPath = "$TranscriptDir\$TranscriptName"
