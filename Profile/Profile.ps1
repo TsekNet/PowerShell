@@ -153,8 +153,7 @@ function Import-GitRepo {
       Write-Verbose "Attempting to download from '$url'"
       if ($item -like "*$ThemeName.psm1") {
         Write-Verbose "'$item' Theme found in FilePath"
-        $fullpath = "$($ThemeSettings.MyThemesLocation)\$ThemeName.psm1"
-
+        $fullpath = "$(Join-Path -Path (Get-ChildItem $profile.CurrentUserAllHosts).Directory.FullName -ChildPath 'PoshThemes')\$ThemeName.psm1"
         if (-not(Test-Path $fullpath)) {
           Write-Verbose "Creating file '$fullpath'"
           New-Item -ItemType File -Force -Path $fullpath | Out-Null
