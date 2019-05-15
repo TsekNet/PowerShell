@@ -126,7 +126,7 @@ function Import-GitRepo {
 
     # List of posh-git themes to download
     [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 4)]
-    [string[]]$ThemeName,
+    [string[]]$Script:ThemeName,
 
     # List of posh-git themes to download
     [Parameter(ValueFromPipelineByPropertyName, Position = 5)]
