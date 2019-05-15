@@ -223,17 +223,17 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 
 #region execution
 
-Write-Verbose "Logging all PowerShell output to $TranscriptPath."
+Write-Verbose 'Logging all PowerShell output to `$TranscriptPath.'
 Start-TranscriptLog
 
-Write-Verbose "PowerShell was started in '$elevation' mode."
+Write-Verbose 'Checking if PowerShell was started as Administrator.'
 Test-IsAdministrator
 
-Write-Verbose 'Setting the PowerShell console title'
+Write-Verbose 'Setting the PowerShell console title.'
 Set-WindowTitle
 
+Write-Verbose 'Attempting to import modules required for profile.'
 $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
-Write-Verbose "Attempting to import modules: '$my_modules'"
 $my_modules | Import-MyModules
 
 Write-Verbose 'Attempting to download latest files from GitHub'
@@ -245,7 +245,7 @@ Write-Verbose 'Changing ll and ls to use the Get-ChildItemColor module instead.'
 Set-Alias ll Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
-Write-Verbose "Setting custom oh-my-posh theme"
+Write-Verbose 'Setting custom oh-my-posh theme'
 Set-Theme 'TsekNet'
 
 Write-Verbose 'Setting the default directory for new PowerShell consoles.'
