@@ -27,7 +27,7 @@ These instructions will get you a copy of the project up and running on your loc
 1. Copy the following into a PowerShell prompt:
 
 ```powershell
-Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1' -OutFile $profile.CurrentUserAllHosts -TimeoutSec 30
+Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1' -OutFile $profile.CurrentUserAllHosts
 ```
 
 1. Restart PowerShell (or run ```powershell & $profile.CurrentUserAllHosts```)
