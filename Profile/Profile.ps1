@@ -126,7 +126,7 @@ function Import-GitRepo {
 
     # List of posh-git themes to download
     [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 4)]
-    [string[]]$Script:ThemeName,
+    [string[]]$ThemeName,
 
     # List of posh-git themes to download
     [Parameter(ValueFromPipelineByPropertyName, Position = 5)]
@@ -245,8 +245,8 @@ Write-Verbose 'Changing ll and ls to use the Get-ChildItemColor module instead.'
 Set-Alias ll Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
-Write-Verbose "Setting oh-my-posh theme to $ThemeName."
-Set-Theme $ThemeName
+Write-Verbose "Setting custom oh-my-posh theme"
+Set-Theme 'TsekNet'
 
 Write-Verbose 'Setting the default directory for new PowerShell consoles.'
 Set-Path -Path 'C:\Tmp'
