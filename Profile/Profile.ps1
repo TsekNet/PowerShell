@@ -223,32 +223,32 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 
 #region execution
 
-Write-Verbose 'Logging all PowerShell output to `$TranscriptPath.'
+Write-Verbose '==Logging all PowerShell output to `$TranscriptPath.=='
 Start-TranscriptLog
 
-Write-Verbose 'Checking if PowerShell was started as Administrator.'
+Write-Verbose '==Checking if PowerShell was started as Administrator.=='
 Test-IsAdministrator
 
-Write-Verbose 'Setting the PowerShell console title.'
+Write-Verbose '==Setting the PowerShell console title.=='
 Set-WindowTitle
 
-Write-Verbose 'Attempting to import modules required for profile.'
+Write-Verbose '==Attempting to import modules required for profile.=='
 $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
 $my_modules | Import-MyModules
 
-Write-Verbose 'Attempting to download latest files from GitHub'
+Write-Verbose '==Attempting to download latest files from GitHub.=='
 Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
   'Profile/Profile.ps1',
 'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 
-Write-Verbose 'Changing ll and ls to use the Get-ChildItemColor module instead.'
+Write-Verbose '==Make ll and ls use the Get-ChildItemColor module instead.=='
 Set-Alias ll Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
-Write-Verbose 'Setting custom oh-my-posh theme'
+Write-Verbose '==Setting custom oh-my-posh theme.=='
 Set-Theme 'TsekNet'
 
-Write-Verbose 'Setting the default directory for new PowerShell consoles.'
+Write-Verbose '==Setting the default directory for new PowerShell consoles.=='
 Set-Path -Path 'C:\Tmp'
 
 #endregion
