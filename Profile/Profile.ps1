@@ -150,32 +150,32 @@ function Import-GitRepo {
   foreach ($item in $FilePath) {
     if ($item -like '*.*') {
       $url = "https://raw.githubusercontent.com/$Owner/$Repository/$Branch/$item"
-      Write-Verbose -Message "Attempting to download from '$url'"
+      Write-Verbose "Attempting to download from '$url'"
       if ($item -like "*$ThemeName.psm1") {
-        Write-Verbose -Message "'$item' Theme found in FilePath"
+        Write-Verbose "'$item' Theme found in FilePath"
         $fullpath = "$($ThemeSettings.MyThemesLocation)\$ThemeName.psm1"
 
-        Write-Verbose -Message "Created file '$fullpath'"
         if (-not(Test-Path $fullpath)) {
+          Write-Verbose "Creating file '$fullpath'"
           New-Item -ItemType File -Force -Path $fullpath | Out-Null
         }
         ($wc.DownloadString("$url")) | Out-File $fullpath
       } elseif ($item -like '*profile.ps1') {
-        Write-Verbose -Message "'$item' Profile found in FilePath"
+        Write-Verbose "'$item' Profile found in FilePath"
         New-Item -ItemType File -Force -Path $ProfileFile | Out-Null
-        Write-Verbose -Message "Created file '$ProfileFile'"
+        Write-Verbose "Created file '$ProfileFile'"
         ($wc.DownloadString("$url")) | Out-File "$ProfileFile"
       } else {
-        Write-Verbose -Message "'$item' found in FilePath"
+        Write-Verbose "'$item' found in FilePath"
         New-Item -ItemType File -Force -Path "$PowerShellModule\$item" | Out-Null
-        Write-Verbose -Message "Created file '$PowerShellModule\$item'"
+        Write-Verbose "Created file '$PowerShellModule\$item'"
         ($wc.DownloadString("$url")) | Out-File "$PowerShellModule\$item"
       }
     } else {
       New-Item -ItemType Container -Force -Path "$PowerShellModule\$item" | Out-Null
-      Write-Verbose -Message "Created file '$PowerShellModule\$item'"
+      Write-Verbose "Created file '$PowerShellModule\$item'"
       $url = "https://raw.githubusercontent.com/$Owner/$Repository/$Branch/$item"
-      Write-Verbose -Message "Attempting to download from $url"
+      Write-Verbose "Attempting to download from $url"
     }
   }
 }
@@ -199,7 +199,7 @@ function Start-TranscriptLog {
     Start-Transcript -Path $TranscriptPath | Out-Null
   }
 
-  Write-Host "TranscriptPath: $TranscriptPath" -ForegroundColor Gray
+  Write-Output "`$TranscriptPath: $TranscriptPath"
 }
 
 #endregion
@@ -224,32 +224,32 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 
 #region execution
 
-# Log all PowerShell Output to file
+Write-Verbose "Logging all PowerShell output to $TranscriptPath."
 Start-TranscriptLog
 
-# Admin verification is used for the title window
+Write-Verbose "PowerShell was started in '$elevation' mode."
 Test-IsAdministrator
 
-# Set the window title
+Write-Verbose 'Setting the PowerShell console title'
 Set-WindowTitle
 
-# Import all my modules
 $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
+Write-Verbose "Attempting to import modules: '$my_modules'"
 $my_modules | Import-MyModules
 
-# Downloaded latest files from GitHub
+Write-Verbose 'Attempting to download latest files from GitHub'
 Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
   'Profile/Profile.ps1',
 'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 
-# Set ll and ls alias to use the new Get-ChildItemColor cmdlets
+Write-Verbose 'Changing ll and ls to use the Get-ChildItemColor module instead.'
 Set-Alias ll Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
-# Set Theme
-Set-Theme TsekNet
+Write-Verbose "Setting oh-my-posh theme to $ThemeName."
+Set-Theme $ThemeName
 
-# Set the current directory to the one set in the function above
+Write-Verbose 'Setting the default directory for new PowerShell consoles.'
 Set-Path -Path 'C:\Tmp'
 
 #endregion
