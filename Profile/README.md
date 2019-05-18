@@ -30,6 +30,14 @@ These instructions will get you a copy of the project up and running on your loc
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1' -OutFile $profile.CurrentUserAllHosts
 ```
 
+1. [Powerline fonts](https://github.com/PowerLine/fonts) are required for the extra extended characters with the nice angled separators you see in the screenshots. To install Powerline fonts using powershell run the following:
+
+```powershell
+git clone https://github.com/PowerLine/fonts
+cd fonts
+.\install.ps1
+```
+
 1. Restart PowerShell (or run ```powershell & $profile.CurrentUserAllHosts```)
 
 *NOTE* When running this for the first time, the startup will be slower, as it is installing all the required modules.
