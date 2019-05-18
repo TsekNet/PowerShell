@@ -77,7 +77,7 @@ function Test-IsAdministrator {
 # Helper function to set the window title
 function Set-WindowTitle {
   $host_title = @{
-    'Elevation' = $(if (Test-IsAdministrator) { "Admin" } else { "Non-Admin" })
+    'Elevation' = $elevation
     'Version'   = $PSVersionTable.PSVersion
     'Edition'   = $PSVersionTable.PSEdition
     'Session'   = "$env:USERNAME@$env:COMPUTERNAME.$env:USERDOMAIN".ToLower()
