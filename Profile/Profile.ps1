@@ -80,7 +80,7 @@ function Set-WindowTitle {
     'Elevation' = $elevation
     'Version'   = $PSVersionTable.PSVersion
     'Edition'   = $PSVersionTable.PSEdition
-    'Session'   = "$env:USERNAME@$env:COMPUTERNAME.$env:USERDOMAIN".ToLower()
+    'Session'   = "$env:USERNAME@$env:COMPUTERNAME.$env:USERDNSDOMAIN".ToLower()
   }
 
   $host.ui.RawUI.WindowTitle = "PowerShell [ $($host_title.Values -join ' | ') ]"
