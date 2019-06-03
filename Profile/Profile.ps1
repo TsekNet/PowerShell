@@ -233,7 +233,7 @@ Write-Verbose '==Setting the PowerShell console title.=='
 Set-WindowTitle
 
 Write-Verbose '==Attempting to import modules required for profile.=='
-$my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
+$my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
 $my_modules | Import-MyModules
 
 Write-Verbose '==Attempting to download latest files from GitHub.=='
