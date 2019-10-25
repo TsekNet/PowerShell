@@ -76,11 +76,9 @@ function Test-IsAdministrator {
 
 # Helper function to set the window title
 function Set-WindowTitle {
-  $host_title = @{
+  $host_title = [ordered]@{
     'Elevation' = $elevation
-    'Version'   = $PSVersionTable.PSVersion
-    'Edition'   = $PSVersionTable.PSEdition
-    'Session'   = "$env:USERNAME@$env:COMPUTERNAME.$env:USERDNSDOMAIN".ToLower()
+    'Session'   = "$env:USERNAME@$env:COMPUTERNAME".ToLower()
   }
 
   $host.ui.RawUI.WindowTitle = "PowerShell [ $($host_title.Values -join ' | ') ]"
@@ -233,7 +231,7 @@ Write-Verbose '==Setting the PowerShell console title.=='
 Set-WindowTitle
 
 Write-Verbose '==Attempting to import modules required for profile.=='
-$my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor')
+$my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
 $my_modules | Import-MyModules
 
 Write-Verbose '==Attempting to download latest files from GitHub.=='
