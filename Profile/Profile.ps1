@@ -84,9 +84,6 @@ function Set-WindowTitle {
   $host.ui.RawUI.WindowTitle = "PowerShell [ $($host_title.Values -join ' | ') ]"
 }
 
-  $host.ui.RawUI.WindowTitle = "PowerShell [ $($host_title.Values -join ' | ') ]"
-}
-
 # Download Files from Github
 function Import-GitRepo {
   <#
