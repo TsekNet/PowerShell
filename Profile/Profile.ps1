@@ -76,12 +76,13 @@ function Test-IsAdministrator {
 
 # Helper function to set the window title
 function Set-WindowTitle {
-  $host_title = @{
+  $host_title = [ordered]@{
     'Elevation' = $elevation
-    'Version'   = $PSVersionTable.PSVersion
-    'Edition'   = $PSVersionTable.PSEdition
-    'Session'   = "$env:USERNAME@$env:COMPUTERNAME.$env:USERDNSDOMAIN".ToLower()
+    'Session'   = "$env:USERNAME@$env:COMPUTERNAME".ToLower()
   }
+
+  $host.ui.RawUI.WindowTitle = "PowerShell [ $($host_title.Values -join ' | ') ]"
+}
 
   $host.ui.RawUI.WindowTitle = "PowerShell [ $($host_title.Values -join ' | ') ]"
 }
