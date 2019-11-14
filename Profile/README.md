@@ -1,8 +1,6 @@
 # TsekNet's Profile
 
-My personal, heavily customized PowerShell profile. Feel free to use and distrubute it as
-you see fit. I am always improving this, so if you catch any errors, or see where I
-can improve, please let me know!
+My personal, heavily customized PowerShell profile.
 
 To use this profile, simply place this file in any of your $profile
 directories and restart your PowerShell console
@@ -38,9 +36,9 @@ cd fonts
 .\install.ps1
 ```
 
-3. Restart PowerShell (or run ```powershell & $profile.CurrentUserAllHosts```)
+3. Run `& $profile.CurrentUserAllHosts`
 
-*NOTE* When running this for the first time, the startup will be slower, as it is installing all the required modules.
+*NOTE* When running this for the first time, the startup may take a few seconds to install all the required modules.
 
 ### Imported Modules
 
@@ -66,7 +64,7 @@ If you run into any errors, $Error[0] will have the latest error message for tro
 
 ## Contributing
 
-Feel free to submit a pull request if you see any issues.
+Please open a pull request with any issues you run into.
 
 ## License
 
