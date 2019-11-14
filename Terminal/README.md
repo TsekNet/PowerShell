@@ -9,12 +9,20 @@ My personal, heavily customized [Windows Terminal profile](https://github.com/mi
 Execute the following command in a PowerShell prompt:
 
 ```powershell
-Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1' -OutFile "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\profiles.json"
+Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/TsekNet/PowerShell/master/Terminal/profiles.json' -OutFile "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\profiles.json"
 ```
+
+## Requirements
+
+1. Windows 10 1903+
+1. Windows Terminal (from Windows store or choco)
+1. PowerShell 7 Preview
+1. PowerShell 5.1
+1. WSL
 
 ## What's included
 
-The Windows Terminal profiles come pre-configured:
+The following Windows Terminal profiles come pre-configured:
 
 1. PowerShell 7 Preview
 2. PowerShell 5
