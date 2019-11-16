@@ -81,11 +81,15 @@ function Test-IsAdministrator {
 
 # Helper function to set the window title
 function Set-WindowTitle {
+  [CmdletBinding()]
+  param ()
   $host_title = [ordered]@{
     'Elevation' = $elevation
     'Version'   = "v$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor)"
     'Session'   = "$env:COMPUTERNAME".ToLower()
   }
+
+  Write-Verbose "Setting Window Title to '$host_title'"
 
   $Host.UI.RawUI.WindowTitle = "PS [ $($host_title.Values -join ' | ') ]"
 }
@@ -205,12 +209,12 @@ function Edit-Profile {
     $psISE.CurrentPowerShellTab.Files.Add($profile.CurrentUserAllHosts)
   }
   else {
-    notepad $profile.CurrentUserAllHosts
+    code-insiders $profile.CurrentUserAllHosts
   }
 }
 
 # Open PowerShell command history file
-function Open-HistoryFile { notepad (Get-PSReadLineOption | Select-Object -ExpandProperty HistorySavePath) }
+function Open-HistoryFile { code-insiders (Get-PSReadLineOption | Select-Object -ExpandProperty HistorySavePath) }
 
 # Compute file hashes - useful for checking successful downloads
 function Get-FileHash256 {
@@ -251,11 +255,11 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 
 #region execution
 
-Write-Verbose "==Removing Powershell startup text.=="
-Clear-Host
-
 Write-Verbose '==Checking if PowerShell was started as Administrator.=='
 Test-IsAdministrator
+
+Write-Verbose "==Removing Powershell startup text.=="
+Clear-Host
 
 Write-Verbose '==Setting the PowerShell console title.=='
 Set-WindowTitle
