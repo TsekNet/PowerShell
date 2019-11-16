@@ -72,7 +72,8 @@ function Write-Theme {
     $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.SessionInfoBackgroundColor -BackgroundColor $sl.Colors.Red
     $prompt += Write-Prompt -Object "$($sl.PromptSymbols.VirtualEnvSymbol) $(Get-VirtualEnvName) " -ForegroundColor $sl.Colors.White -BackgroundColor $sl.Colors.Red
     $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.Red -BackgroundColor $sl.Colors.DarkCyan
-  } else {
+  }
+  else {
     $prompt += Write-Prompt -Object " $driveLetter " -ForegroundColor $sl.Colors.DarkCyan -BackgroundColor $sl.Colors.Gray
     $prompt += Write-Prompt -Object $($sl.PromptSymbols.SegmentForwardSymbol) -ForegroundColor $sl.Colors.Gray -BackgroundColor $sl.Colors.DarkCyan
   }
@@ -87,7 +88,8 @@ function Write-Theme {
     if ($Two.Length -gt 10) { $Two = "$($Two[0..7] -join '')~" }
 
     $prompt += Write-Prompt -Object " $($fullPath.split($sl.PromptSymbols.ForwardHollowArrow)[0], " .. ", $Two, $One -join ($sl.PromptSymbols.ForwardHollowArrow)) " -ForegroundColor $sl.Colors.White -BackgroundColor $sl.Colors.DarkCyan
-  } else {
+  }
+  else {
     $prompt += Write-Prompt -Object " $fullPath "-ForegroundColor $sl.Colors.White -BackgroundColor $sl.Colors.DarkCyan
   }
 
@@ -98,14 +100,15 @@ function Write-Theme {
     $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $sl.Colors.DarkCyan -BackgroundColor $sl.Colors.Magenta
     $prompt += Write-Prompt -Object " $($themeInfo.VcInfo) " -BackgroundColor $sl.Colors.Magenta -ForegroundColor $sl.Colors.Black
     $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $sl.Colors.Magenta
-  } else {
+  }
+  else {
     $prompt += Write-Prompt -Object $sl.PromptSymbols.SegmentForwardSymbol -ForegroundColor $sl.Colors.DarkCyan
   }
 
   $timestamp = Get-Date -f "T"
 
   # Writes the Invocation time and date
-  $prompt += Set-CursorForRightBlockWrite -textLength ($timestamp.Length + 13)
+  $prompt += Set-CursorForRightBlockWrite -textLength ($timestamp.Length + 15)
   $prompt += Write-Prompt $($sl.PromptSymbols.SegmentBackwardSymbol) -ForegroundColor $sl.Colors.DarkCyan
   $prompt += Write-Prompt $(Get-Elapsed) -ForegroundColor $sl.Colors.Yellow -BackgroundColor $sl.Colors.DarkCyan
   $prompt += Write-Prompt $($sl.PromptSymbols.SegmentBackwardSymbol) -ForegroundColor $sl.Colors.Blue -BackgroundColor $sl.Colors.DarkCyan

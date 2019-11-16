@@ -1,28 +1,31 @@
 ﻿<#
-.SYNOPSIS
-  @TsekNet PowerShell Profile.
+  .SYNOPSIS
+    @TsekNet PowerShell Profile.
 
-.DESCRIPTION
-  My heavily customized PowerShell profile. Feel free to use and distrubute as
-  you see fit. Always improving this, if you catch any errors, or see where I
-  can improve this, please let me know!
+  .DESCRIPTION
+    Personal heavily customized PowerShell profile. Feel free to use and distrubute as
+    you see fit. Expect frequent updates. Please file PRs for any errors/improvements.
 
-  To use this profile, simply place this file in any of your $profile
-  directories and restart your PowerShell console
-  (Ex: $profile.CurrentUserAllHosts)
+    To use this profile, simply place this file in any of your $profile
+    directories and restart your PowerShell console
+    (Ex: $profile.CurrentUserAllHosts)
 
-.LINK
-  TsekNet.com
-  GitHub.com/TsekNet
-  Twitter.com/TsekNet
+    Execution of functions can be found a the bottom of this profile script.
+
+  .LINK
+    TsekNet.com
+    GitHub.com/TsekNet
+    Twitter.com/TsekNet
 #>
+[CmdletBinding()]
+param ()
 
 #region function declarations
 
 # Helper function to change directory to my development workspace
 function Set-Path {
   [CmdletBinding()]
-  Param(
+  Param (
     [ValidateScript( {
         if (-Not ($_ | Test-Path) ) {
           Write-Verbose "Creating default location $_"
@@ -35,33 +38,32 @@ function Set-Path {
   Set-Location $Path
 }
 
-# Helper function to copy the last command entered
-function Copy-LastCommand {
-  Get-History -id $(((Get-History) | Select-Object -Last 1 |
-      Select-Object ID -ExpandProperty ID)) |
-  Select-Object -ExpandProperty CommandLine |
-  clip
-}
-
 # Helper function to ensure all modules are loaded, with error handling
 function Import-MyModules {
   [CmdletBinding()]
   param (
-    [Parameter(Mandatory, ValueFromPipeline)]
-    [string]
-    $Name
+    [Parameter(Mandatory)]
+    [string[]]$Modules
   )
 
-  try {
-    Import-Module -Name $Name -ErrorAction Stop
-  } catch {
-    $lookup = Find-Module -Name $Name
-    if (-not $lookup) {
-      Write-Error "Module `"$Name`" not found."
-      continue
+  foreach ($Module in $Modules) {
+    if (Get-Module -ListAvailable -Name $Module -Verbose:$false) {
+      Write-Verbose "Module '$Module' found, skipping install."
+      Continue
     }
-    Install-Module -Name $Name -Scope CurrentUser -Force
-    Import-Module -Name $Name
+    try {
+      Write-Verbose "Attemping to install module '$Module"
+      Import-Module -Name $Module -ErrorAction Stop
+    }
+    catch {
+      $lookup = Find-Module -Name $Module
+      if (-not $lookup) {
+        Write-Error "Module `"$Module`" not found."
+        continue
+      }
+      Install-Module -Name $Module -Scope CurrentUser -Force -AllowClobber
+      Import-Module -Name $Module
+    }
   }
 }
 
@@ -69,7 +71,8 @@ function Import-MyModules {
 function Test-IsAdministrator {
   if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
     $script:elevation = "Admin"
-  } else {
+  }
+  else {
     $script:elevation = "Non-Admin"
   }
 }
@@ -78,10 +81,11 @@ function Test-IsAdministrator {
 function Set-WindowTitle {
   $host_title = [ordered]@{
     'Elevation' = $elevation
-    'Session'   = "$env:USERNAME@$env:COMPUTERNAME".ToLower()
+    'Version'   = "v$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor)"
+    'Session'   = "$env:COMPUTERNAME".ToLower()
   }
 
-  $host.ui.RawUI.WindowTitle = "PowerShell [ $($host_title.Values -join ' | ') ]"
+  $host.ui.RawUI.WindowTitle = "PS [ $($host_title.Values -join ' | ') ]"
 }
 
 # Download Files from Github
@@ -104,8 +108,7 @@ function Import-GitRepo {
   [CmdletBinding()]
   [Alias()]
   [OutputType([int])]
-  Param
-  (
+  Param (
     # Repository owner
     [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 0)]
     [string]$Owner,
@@ -128,7 +131,7 @@ function Import-GitRepo {
 
     # List of posh-git themes to download
     [Parameter(ValueFromPipelineByPropertyName, Position = 5)]
-    [string]$ProfileFile = $profile.CurrentUserAllHosts
+    [System.IO.FileInfo]$ProfileFile = $profile.CurrentUserAllHosts
   )
 
   $modulespath = ($env:psmodulepath -split ";")[0]
@@ -157,18 +160,21 @@ function Import-GitRepo {
           New-Item -ItemType File -Force -Path $fullpath | Out-Null
         }
         ($wc.DownloadString("$url")) | Out-File $fullpath
-      } elseif ($item -like '*profile.ps1') {
+      }
+      elseif ($item -like '*profile.ps1') {
         Write-Verbose "'$item' Profile found in FilePath"
         New-Item -ItemType File -Force -Path $ProfileFile | Out-Null
         Write-Verbose "Created file '$ProfileFile'"
         ($wc.DownloadString("$url")) | Out-File "$ProfileFile"
-      } else {
+      }
+      else {
         Write-Verbose "'$item' found in FilePath"
         New-Item -ItemType File -Force -Path "$PowerShellModule\$item" | Out-Null
         Write-Verbose "Created file '$PowerShellModule\$item'"
         ($wc.DownloadString("$url")) | Out-File "$PowerShellModule\$item"
       }
-    } else {
+    }
+    else {
       New-Item -ItemType Container -Force -Path "$PowerShellModule\$item" | Out-Null
       Write-Verbose "Created file '$PowerShellModule\$item'"
       $url = "https://raw.githubusercontent.com/$Owner/$Repository/$Branch/$item"
@@ -177,43 +183,65 @@ function Import-GitRepo {
   }
 }
 
+#endregion
 
-# Helper function to log all PowerShell invocations
-function Start-TranscriptLog {
-  [CmdletBinding()]
-  Param (
-    [System.IO.FileInfo]$TranscriptDir = "$(Get-ChildItem $profile.CurrentUserAllHosts |
-    Select-Object -ExpandProperty Directory)\Transcripts\$(Get-Date -Format yyyy)\$(Get-Date -UFormat %B)",
-    [String]$TranscriptName = "$(Get-Date -Format dd-MM-yyyy).log"
-  )
+#region helper functions
 
-  # Make variable available at all times
-  $global:TranscriptPath = "$TranscriptDir\$TranscriptName"
-  if ($TranscriptPath) {
-    Start-Transcript -Path $TranscriptPath -Append | Out-Null
-  } else {
-    New-Item -ItemType Directory -Path $TranscriptDir -Force | Out-Null
-    Start-Transcript -Path $TranscriptPath | Out-Null
+Write-Verbose "==Setting command aliases.=="
+
+# Copy the last command entered
+function Copy-LastCommand {
+  Get-History -id $(((Get-History) | Select-Object -Last 1 |
+      Select-Object ID -ExpandProperty ID)) |
+  Select-Object -ExpandProperty CommandLine |
+  clip
+}
+
+# Make it easy to edit this profile once it's installed
+function Edit-Profile {
+  if ($host.Name -match "ise") {
+    $psISE.CurrentPowerShellTab.Files.Add($profile.CurrentUserAllHosts)
   }
+  else {
+    notepad $profile.CurrentUserAllHosts
+  }
+}
 
-  Write-Output "`$TranscriptPath: $TranscriptPath"
+# Open PowerShell command history file
+function Open-HistoryFile { code-insiders (Get-PSReadLineOption | Select-Object -ExpandProperty HistorySavePath) }
+
+# Compute file hashes - useful for checking successful downloads
+function Get-FileHash256 {
+  $sha_256_hash = (Get-FileHash -Algorithm SHA256 $args).hash
+  Write-Output "Hash for $args is '$sha_256_hash'"
+  $sha_256_hash | clip
+}
+
+function Get-ExportedFunctions {
+  try {
+    $helper_functions = (Get-Module $profile.CurrentUserAllHosts -ListAvailable | Select-Object -ExpandProperty ExportedCommands).Values.Name -join ', '
+    Write-Output "Helper functions: $helper_functions"
+  }
+  catch {
+    Write-Error "Error obtaining helper function list: $_"
+  }
 }
 
 #endregion
 
 #region statements
 
-# If it's Windows PowerShell, we can turn on Verbose output if you're holding shift
+# Hold shift to turn on verbosity if running Windows PowerShell
 if ("Desktop" -eq $PSVersionTable.PSEdition) {
-  # Check SHIFT state ASAP at startup so I can use that to control verbosity :)
   Add-Type -Assembly PresentationCore, WindowsBase
   try {
     if ([System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::LeftShift) -OR
       [System.Windows.Input.Keyboard]::IsKeyDown([System.Windows.Input.Key]::RightShift)) {
       $VerbosePreference = "Continue"
     }
-  } catch {
-    # If that didn't work ... oh well.
+  }
+  catch {
+    Write-Warning "Error displaying verbosity via SHIFT key."
   }
 }
 
@@ -221,8 +249,8 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 
 #region execution
 
-Write-Verbose '==Logging all PowerShell output to `$TranscriptPath.=='
-Start-TranscriptLog
+Write-Verbose "==Removing Powershell startup text.=="
+Clear-Host
 
 Write-Verbose '==Checking if PowerShell was started as Administrator.=='
 Test-IsAdministrator
@@ -230,23 +258,31 @@ Test-IsAdministrator
 Write-Verbose '==Setting the PowerShell console title.=='
 Set-WindowTitle
 
-Write-Verbose '==Attempting to import modules required for profile.=='
+Write-Verbose '==Importing modules required for profile.=='
 $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
-$my_modules | Import-MyModules
+Import-MyModules -Modules $my_modules
 
-Write-Verbose '==Attempting to download latest files from GitHub.=='
+Write-Verbose '==Getting latest Powershell profile files from GitHub.=='
 Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
   'Profile/Profile.ps1',
 'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
-
-Write-Verbose '==Make ll and ls use the Get-ChildItemColor module instead.=='
-Set-Alias ll Get-ChildItemColor -Option AllScope
-Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 
 Write-Verbose '==Setting custom oh-my-posh theme.=='
 Set-Theme 'TsekNet'
 
 Write-Verbose '==Setting the default directory for new PowerShell consoles.=='
 Set-Path -Path 'C:\Tmp'
+
+Write-Verbose '==Changing to bash-like tab completion.=='
+Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+Set-PSReadlineOption -ShowToolTips -BellStyle Visual
+
+Write-Verbose '==Setting Aliases.=='
+Set-Alias ll Get-ChildItemColor -Option AllScope
+Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
+Set-Alias History Open-HistoryFile
+
+Write-Verbose '==Getting list of helper functions.=='
+Get-ExportedFunctions
 
 #endregion
