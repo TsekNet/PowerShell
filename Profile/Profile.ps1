@@ -280,7 +280,7 @@ Set-PSReadlineOption -ShowToolTips -BellStyle Visual
 Write-Verbose '==Setting Aliases.=='
 Set-Alias ll Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
-Set-Alias History Open-HistoryFile
+Set-Alias History Open-HistoryFile -Option AllScope
 
 Write-Verbose '==Getting list of helper functions.=='
 Get-ExportedFunctions
