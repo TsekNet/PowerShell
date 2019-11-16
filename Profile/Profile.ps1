@@ -71,9 +71,11 @@ function Import-MyModules {
 function Test-IsAdministrator {
   if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
     $script:elevation = "Admin"
+    Write-Output "Powershell is running as: $script:elevation"
   }
   else {
     $script:elevation = "Non-Admin"
+    Write-Output "Powershell is running as: $script:elevation"
   }
 }
 
