@@ -85,7 +85,7 @@ function Set-WindowTitle {
     'Session'   = "$env:COMPUTERNAME".ToLower()
   }
 
-  $host.ui.RawUI.WindowTitle = "PS [ $($host_title.Values -join ' | ') ]"
+  $Host.UI.RawUI.WindowTitle = "PS [ $($host_title.Values -join ' | ') ]"
 }
 
 # Download Files from Github
@@ -208,7 +208,7 @@ function Edit-Profile {
 }
 
 # Open PowerShell command history file
-function Open-HistoryFile { code-insiders (Get-PSReadLineOption | Select-Object -ExpandProperty HistorySavePath) }
+function Open-HistoryFile { notepad (Get-PSReadLineOption | Select-Object -ExpandProperty HistorySavePath) }
 
 # Compute file hashes - useful for checking successful downloads
 function Get-FileHash256 {
