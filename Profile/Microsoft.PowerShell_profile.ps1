@@ -278,7 +278,7 @@ Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
 'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 
 Write-Verbose '==Setting custom oh-my-posh theme=='
-Set-Theme 'TsekNet'
+Set-Theme 'TsekNet' -Verbose:$false
 
 Write-Verbose '==Checking console elevation=='
 Get-Elevation
