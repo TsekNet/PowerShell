@@ -291,7 +291,7 @@ $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
 Import-MyModules -Modules $my_modules
 
 Write-Verbose '==Setting the default directory for new PowerShell consoles=='
-Set-Path
+Set-Path 'C:\Tmp'
 
 Write-Verbose '==Installing fonts if necessary=='
 Install-Fonts
