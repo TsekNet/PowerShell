@@ -54,7 +54,7 @@ function Import-MyModules {
     }
     try {
       Write-Verbose "Attemping to install module '$Module"
-      Import-Module -Name $Module -ErrorAction Stop
+      Import-Module -Name $Module -ErrorAction Stop -Verbose:$false
     }
     catch {
       $lookup = Find-Module -Name $Module
@@ -63,7 +63,7 @@ function Import-MyModules {
         continue
       }
       Install-Module -Name $Module -Scope CurrentUser -Force -AllowClobber
-      Import-Module -Name $Module
+      Import-Module -Name $Module -Verbose:$false
     }
   }
 }
