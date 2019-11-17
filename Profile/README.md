@@ -3,8 +3,7 @@
 My personal, heavily customized PowerShell profile.
 
 To use this profile, simply place this file in any of your $profile
-directories and restart your PowerShell console
-(Ex: $profile.CurrentUserAllHosts)
+directories and restart your PowerShell console.
 
 ## Screenshots
 
