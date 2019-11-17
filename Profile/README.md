@@ -2,8 +2,8 @@
 
 My personal, heavily customized PowerShell profile.
 
-To use this profile, simply place this file in any of your `$profile`
-directories and restart your PowerShell console.
+To use this profile, place this file in your `$profile`
+directory and restart your PowerShell console.
 
 ## Screenshots
 
