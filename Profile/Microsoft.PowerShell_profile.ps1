@@ -198,7 +198,7 @@ function Install-Fonts {
   if (-not(Test-Path $TestFont)) {
     Write-Verbose "Installing Fonts to $($TestFont.DirectoryName)"
     git clone https://github.com/PowerLine/fonts
-    Set-Path fonts
+    Set-Location fonts
     .\install.ps1
   }
 }
