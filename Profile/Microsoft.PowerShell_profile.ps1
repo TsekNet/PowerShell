@@ -35,6 +35,7 @@ function Set-Path {
       })]
     [System.IO.FileInfo]$Path
   )
+  Write-Verbose "Setting path to $Path."
   Set-Location $Path
 }
 
@@ -246,19 +247,6 @@ function Get-ExportedFunctions {
   }
 }
 
-function Set-PathToTemp {
-  [CmdletBinding()]
-  param (
-    [System.IO.FileInfo]$Path = 'C:\Tmp'
-  )
-  if (-not(Test-Path $Path)) {
-    Write-Verbose "Default path $Path not detected, creating..."
-    New-Item -Path $Path -ItemType Directory -Force
-  }
-  Write-Verbose "Setting path to $Path."
-  Set-Path -Path $Path
-}
-
 #endregion
 
 #region statements
@@ -303,7 +291,7 @@ $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
 Import-MyModules -Modules $my_modules
 
 Write-Verbose '==Setting the default directory for new PowerShell consoles=='
-Set-PathToTemp
+Set-Path
 
 Write-Verbose '==Installing fonts if necessary=='
 Install-Fonts
