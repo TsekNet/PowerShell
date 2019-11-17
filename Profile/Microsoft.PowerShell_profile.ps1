@@ -159,7 +159,7 @@ function Import-GitRepo {
       $url = "https://raw.githubusercontent.com/$Owner/$Repository/$Branch/$item"
       Write-Verbose "Attempting to download from '$url'"
       if ($item -like "*$ThemeName.psm1") {
-        Write-Verbose "'$item' Theme found in FilePath"
+        Write-Verbose "'$item' detected, overwriting..."
         $fullpath = "$(Join-Path -Path (Get-ChildItem $profile).Directory.FullName -ChildPath 'PoshThemes')\$ThemeName.psm1"
         if (-not(Test-Path $fullpath)) {
           Write-Verbose "Creating file '$fullpath'"
@@ -168,13 +168,13 @@ function Import-GitRepo {
         ($wc.DownloadString("$url")) | Out-File $fullpath
       }
       elseif ($item -like '*profile.ps1') {
-        Write-Verbose "'$item' Profile found in FilePath"
+        Write-Verbose "'$item' detected, overwriting..."
         New-Item -ItemType File -Force -Path $profile | Out-Null
         Write-Verbose "Created file '$profile'"
         ($wc.DownloadString("$url")) | Out-File "$profile"
       }
       else {
-        Write-Verbose "'$item' found in FilePath"
+        Write-Verbose "'$item' detected, overwriting..."
         New-Item -ItemType File -Force -Path "$PowerShellModule\$item" | Out-Null
         Write-Verbose "Created file '$PowerShellModule\$item'"
         ($wc.DownloadString("$url")) | Out-File "$PowerShellModule\$item"
@@ -286,7 +286,7 @@ Clear-Host
 
 Write-Verbose '==Getting latest profile files from GitHub=='
 Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
-  'Profile/Profile.ps1',
+  'Profile/Microsoft.PowerShell_profile.ps1',
 'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 
 Write-Verbose '==Setting custom oh-my-posh theme=='
