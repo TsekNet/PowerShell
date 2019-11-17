@@ -269,43 +269,48 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 
 #region execution
 
-Write-Verbose '==Removing default start up message=='
-Clear-Host
+try {
+  Write-Verbose '==Removing default start up message=='
+  Clear-Host
 
-Write-Verbose '==Getting latest profile files from GitHub=='
-Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
-  'Profile/Microsoft.PowerShell_profile.ps1',
-'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
+  Write-Verbose '==Getting latest profile files from GitHub=='
+  Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
+    'Profile/Microsoft.PowerShell_profile.ps1',
+  'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 
-Write-Verbose '==Setting custom oh-my-posh theme=='
-Set-Theme 'TsekNet' -Verbose:$false
+  Write-Verbose '==Setting custom oh-my-posh theme=='
+  Set-Theme 'TsekNet' -Verbose:$false
 
-Write-Verbose '==Checking console elevation=='
-Get-Elevation
+  Write-Verbose '==Checking console elevation=='
+  Get-Elevation
 
-Write-Verbose '==Setting the console title=='
-Set-WindowTitle
+  Write-Verbose '==Setting the console title=='
+  Set-WindowTitle
 
-Write-Verbose '==Importing modules required for profile=='
-$my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
-Import-MyModules -Modules $my_modules
+  Write-Verbose '==Importing modules required for profile=='
+  $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
+  Import-MyModules -Modules $my_modules
 
-Write-Verbose '==Setting the default directory for new PowerShell consoles=='
-Set-Path 'C:\Tmp'
+  Write-Verbose '==Setting the default directory for new PowerShell consoles=='
+  Set-Path 'C:\Tmp'
 
-Write-Verbose '==Installing fonts if necessary=='
-Install-Fonts
+  Write-Verbose '==Installing fonts if necessary=='
+  Install-Fonts
 
-Write-Verbose '==Changing to bash-like tab completion=='
-Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
-Set-PSReadlineOption -ShowToolTips -BellStyle Visual
+  Write-Verbose '==Changing to bash-like tab completion=='
+  Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+  Set-PSReadlineOption -ShowToolTips -BellStyle Visual
 
-Write-Verbose '==Setting aliases=='
-Set-Alias ll Get-ChildItemColor -Option AllScope
-Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
-Set-Alias History Open-HistoryFile -Option AllScope
+  Write-Verbose '==Setting aliases=='
+  Set-Alias ll Get-ChildItemColor -Option AllScope
+  Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
+  Set-Alias History Open-HistoryFile -Option AllScope
 
-Write-Verbose '==Getting and displaying list of helper functions=='
-Get-ExportedFunctions
+  Write-Verbose '==Getting and displaying list of helper functions=='
+  Get-ExportedFunctions
+}
+catch {
+  throw "Error configuring `$profile on line $($_.InvocationInfo.ScriptLineNumber): $_"
+}
 
 #endregion
