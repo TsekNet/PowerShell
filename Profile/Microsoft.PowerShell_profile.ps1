@@ -8,7 +8,7 @@
 
     To use this profile, simply place this file in any of your $profile
     directories and restart your PowerShell console
-    (Ex: $profile.CurrentUserAllHosts)
+    (Ex: $profile)
 
     Execution of functions can be found a the bottom of this profile script.
 
@@ -137,11 +137,7 @@ function Import-GitRepo {
 
     # List of posh-git themes to download
     [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 4)]
-    [string[]]$ThemeName,
-
-    # List of posh-git themes to download
-    [Parameter(ValueFromPipelineByPropertyName, Position = 5)]
-    [System.IO.FileInfo]$ProfileFile = $profile.CurrentUserAllHosts
+    [string[]]$ThemeName
   )
 
   $modulespath = ($env:psmodulepath -split ";")[0]
@@ -153,9 +149,9 @@ function Import-GitRepo {
     New-Item -Type Container -Path $PowerShellModule -Force | Out-Null
   }
 
-  if (-not(Test-Path $ProfileFile)) {
+  if (-not(Test-Path $profile)) {
     Write-Verbose "Creating profile"
-    New-Item -Path $ProfileFile -Force | Out-Null
+    New-Item -Path $profile -Force | Out-Null
   }
 
   foreach ($item in $FilePath) {
@@ -164,7 +160,7 @@ function Import-GitRepo {
       Write-Verbose "Attempting to download from '$url'"
       if ($item -like "*$ThemeName.psm1") {
         Write-Verbose "'$item' Theme found in FilePath"
-        $fullpath = "$(Join-Path -Path (Get-ChildItem $profile.CurrentUserAllHosts).Directory.FullName -ChildPath 'PoshThemes')\$ThemeName.psm1"
+        $fullpath = "$(Join-Path -Path (Get-ChildItem $profile).Directory.FullName -ChildPath 'PoshThemes')\$ThemeName.psm1"
         if (-not(Test-Path $fullpath)) {
           Write-Verbose "Creating file '$fullpath'"
           New-Item -ItemType File -Force -Path $fullpath | Out-Null
@@ -173,9 +169,9 @@ function Import-GitRepo {
       }
       elseif ($item -like '*profile.ps1') {
         Write-Verbose "'$item' Profile found in FilePath"
-        New-Item -ItemType File -Force -Path $ProfileFile | Out-Null
-        Write-Verbose "Created file '$ProfileFile'"
-        ($wc.DownloadString("$url")) | Out-File "$ProfileFile"
+        New-Item -ItemType File -Force -Path $profile | Out-Null
+        Write-Verbose "Created file '$profile'"
+        ($wc.DownloadString("$url")) | Out-File "$profile"
       }
       else {
         Write-Verbose "'$item' found in FilePath"
@@ -223,10 +219,10 @@ function Copy-LastCommand {
 # Make it easy to edit this profile once it's installed
 function Edit-Profile {
   if ($host.Name -match "ise") {
-    $psISE.CurrentPowerShellTab.Files.Add($profile.CurrentUserAllHosts)
+    $psISE.CurrentPowerShellTab.Files.Add($profile)
   }
   else {
-    code-insiders $profile.CurrentUserAllHosts
+    code-insiders $profile
   }
 }
 
@@ -242,7 +238,7 @@ function Get-FileHash256 {
 
 function Get-ExportedFunctions {
   try {
-    $helper_functions = (Get-Module $profile.CurrentUserAllHosts -ListAvailable | Select-Object -ExpandProperty ExportedCommands).Values.Name -join ', '
+    $helper_functions = (Get-Module $profile -ListAvailable | Select-Object -ExpandProperty ExportedCommands).Values.Name -join ', '
     Write-Output "Helper functions: $helper_functions"
   }
   catch {
@@ -323,8 +319,5 @@ Set-Alias History Open-HistoryFile -Option AllScope
 
 Write-Verbose '==Getting list of helper functions=='
 Get-ExportedFunctions
-
-Write-Verbose '==Launching PowerShell profile=='
-& $profile.CurrentUserAllHosts
 
 #endregion

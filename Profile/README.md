@@ -22,13 +22,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Installation
 
-1. Copy the following into a PowerShell prompt:
+Copy the following into a PowerShell prompt:
 
 ```powershell
-Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1' -OutFile $profile.CurrentUserAllHosts
+iwr https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1 -o $profile; & $profile
 ```
 
-**_NOTE:_** When running this for the first time, the startup may take a few seconds to install all the required modules.
+**_NOTE:_** When running this for the first time, the startup may take a minute to install all the required modules & fonts.
 
 ### Imported Modules
 
@@ -43,11 +43,11 @@ Get-ChildItemColor
 ## What's included
 
 1. Set the PowerShell Window Title with useful information such as elevation and version.
-1. Install/Import modules listed above.
-1. Overwrite `ll` / `ls` / `history` commands for better results.
-1. Download/Set personal theme [TsekNet.psm1](Themes/TsekNet.psm1).
-1. Install Powerline fonts (https://github.com/PowerLine/fonts) using `posh-git`.
-1. Set default path.
+2. Install/Import modules listed above.
+3. Overwrite `ll` / `ls` / `history` commands for better results.
+4. Download/Set personal theme [TsekNet.psm1](Themes/TsekNet.psm1).
+5. Install Powerline fonts (https://github.com/PowerLine/fonts) using `posh-git`.
+6. Set default path.
 
 ## Troubleshooting
 
