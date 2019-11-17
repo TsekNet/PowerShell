@@ -2,7 +2,7 @@
 
 My personal, heavily customized PowerShell profile.
 
-To use this profile, simply place this file in any of your $profile
+To use this profile, simply place this file in any of your `$profile`
 directories and restart your PowerShell console.
 
 ## Screenshots
@@ -11,7 +11,7 @@ PowerShell running in an administrative window while working on a git repo
 
 ![PowerShell Admin](Admin_Git.png)
 
-PowerShell running in a non-admin window while working in C:\Tmp
+PowerShell running in a non-admin window while working in `C:\Tmp`
 
 ![PowerShell Non-Admin](Non-Admin.png)
 
@@ -50,7 +50,7 @@ Get-ChildItemColor
 
 ## Troubleshooting
 
-Errors will be displayed to console, $Error[0] will have the latest error message if necessary for troubleshooting.
+Errors will be displayed to console, `$Error[0]` will have the latest error message if necessary for troubleshooting.
 
 ## Contributing
 
