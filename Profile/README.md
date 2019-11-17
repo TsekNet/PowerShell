@@ -28,17 +28,7 @@ These instructions will get you a copy of the project up and running on your loc
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/tseknet/PowerShell/master/Profile/Profile.ps1' -OutFile $profile.CurrentUserAllHosts
 ```
 
-2. [Powerline fonts](https://github.com/PowerLine/fonts) are required for the extra extended characters with the nice angled separators you see in the screenshots. To install Powerline fonts using powershell run the following:
-
-```powershell
-git clone https://github.com/PowerLine/fonts
-cd fonts
-.\install.ps1
-```
-
-3. Run `& $profile.CurrentUserAllHosts`
-
-*NOTE* When running this for the first time, the startup may take a few seconds to install all the required modules.
+**_NOTE:_** When running this for the first time, the startup may take a few seconds to install all the required modules.
 
 ### Imported Modules
 
@@ -54,13 +44,14 @@ Get-ChildItemColor
 
 1. Set the PowerShell Window Title with useful information such as elevation and version.
 1. Install/Import modules listed above.
-1. Overwrite ll / ls commands with Get-ChildItemColor for better output
-1. Download/Set personal theme [TsekNet.psm1](Themes/TsekNet.psm1)
-1. Set default path
+1. Overwrite `ll` / `ls` / `history` commands for better results.
+1. Download/Set personal theme [TsekNet.psm1](Themes/TsekNet.psm1).
+1. Install Powerline fonts (https://github.com/PowerLine/fonts) using `posh-git`.
+1. Set default path.
 
 ## Troubleshooting
 
-If you run into any errors, $Error[0] will have the latest error message for troubleshooting.
+Errors will be displayed to console, $Error[0] will have the latest error message if necessary for troubleshooting.
 
 ## Contributing
 

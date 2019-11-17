@@ -68,14 +68,16 @@ function Import-MyModules {
 }
 
 # Helper function to test prompt elevation
-function Test-IsAdministrator {
-  if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
+function Get-Elevation {
+  [CmdletBinding()]
+  param ()
+  if (Test-Administrator) {
     $script:elevation = "Admin"
-    Write-Output "Powershell is running as: $script:elevation"
+    Write-Verbose "Powershell is running as: $script:elevation"
   }
   else {
     $script:elevation = "Non-Admin"
-    Write-Output "Powershell is running as: $script:elevation"
+    Write-Verbose "Powershell is running as: $script:elevation"
   }
 }
 
@@ -89,9 +91,11 @@ function Set-WindowTitle {
     'Session'   = "$env:COMPUTERNAME".ToLower()
   }
 
-  Write-Verbose "Setting Window Title to '$host_title'"
+  $formatted_title = "PS [ $($host_title.Values -join ' | ') ]"
 
-  $Host.UI.RawUI.WindowTitle = "PS [ $($host_title.Values -join ' | ') ]"
+  Write-Verbose "Setting Window Title to '$formatted_title'"
+
+  $Host.UI.RawUI.WindowTitle = $formatted_title
 }
 
 # Download Files from Github
@@ -114,7 +118,7 @@ function Import-GitRepo {
   [CmdletBinding()]
   [Alias()]
   [OutputType([int])]
-  Param (
+  param (
     # Repository owner
     [Parameter(Mandatory, ValueFromPipelineByPropertyName, Position = 0)]
     [string]$Owner,
@@ -189,11 +193,24 @@ function Import-GitRepo {
   }
 }
 
+function Install-Fonts {
+  [CmdletBinding()]
+  param (
+    [System.IO.FileInfo]$TestFont = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts\DejaVu Sans Mono for Powerline.ttf"
+  )
+  if (-not(Test-Path $TestFont)) {
+    Write-Verbose "Installing Fonts to $($TestFont.DirectoryName)"
+    git clone https://github.com/PowerLine/fonts
+    Set-Path fonts
+    .\install.ps1
+  }
+}
+
 #endregion
 
 #region helper functions
 
-Write-Verbose "==Setting command aliases.=="
+Write-Verbose "==Setting command aliases=="
 
 # Copy the last command entered
 function Copy-LastCommand {
@@ -233,6 +250,19 @@ function Get-ExportedFunctions {
   }
 }
 
+function Set-PathToTemp {
+  [CmdletBinding()]
+  param (
+    [System.IO.FileInfo]$Path = 'C:\Tmp'
+  )
+  if (-not(Test-Path $Path)) {
+    Write-Verbose "Default path $Path not detected, creating..."
+    New-Item -Path $Path -ItemType Directory -Force
+  }
+  Write-Verbose "Setting path to $Path."
+  Set-Path -Path $Path
+}
+
 #endregion
 
 #region statements
@@ -255,40 +285,46 @@ if ("Desktop" -eq $PSVersionTable.PSEdition) {
 
 #region execution
 
-Write-Verbose '==Checking if PowerShell was started as Administrator.=='
-Test-IsAdministrator
-
-Write-Verbose "==Removing Powershell startup text.=="
+Write-Verbose '==Removing default start up message=='
 Clear-Host
 
-Write-Verbose '==Setting the PowerShell console title.=='
-Set-WindowTitle
-
-Write-Verbose '==Importing modules required for profile.=='
-$my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
-Import-MyModules -Modules $my_modules
-
-Write-Verbose '==Getting latest Powershell profile files from GitHub.=='
+Write-Verbose '==Getting latest profile files from GitHub=='
 Import-GitRepo -Owner tseknet -Repository PowerShell -FilePath `
   'Profile/Profile.ps1',
 'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 
-Write-Verbose '==Setting custom oh-my-posh theme.=='
+Write-Verbose '==Setting custom oh-my-posh theme=='
 Set-Theme 'TsekNet'
 
-Write-Verbose '==Setting the default directory for new PowerShell consoles.=='
-Set-Path -Path 'C:\Tmp'
+Write-Verbose '==Checking console elevation=='
+Get-Elevation
 
-Write-Verbose '==Changing to bash-like tab completion.=='
+Write-Verbose '==Setting the console title=='
+Set-WindowTitle
+
+Write-Verbose '==Importing modules required for profile=='
+$my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
+Import-MyModules -Modules $my_modules
+
+Write-Verbose '==Setting the default directory for new PowerShell consoles=='
+Set-PathToTemp
+
+Write-Verbose '==Installing fonts if necessary=='
+Install-Fonts
+
+Write-Verbose '==Changing to bash-like tab completion=='
 Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 Set-PSReadlineOption -ShowToolTips -BellStyle Visual
 
-Write-Verbose '==Setting Aliases.=='
+Write-Verbose '==Setting aliases=='
 Set-Alias ll Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 Set-Alias History Open-HistoryFile -Option AllScope
 
-Write-Verbose '==Getting list of helper functions.=='
+Write-Verbose '==Getting list of helper functions=='
 Get-ExportedFunctions
+
+Write-Verbose '==Launching PowerShell profile=='
+& $profile.CurrentUserAllHosts
 
 #endregion

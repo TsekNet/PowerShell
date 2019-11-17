@@ -64,9 +64,19 @@ function Write-Theme {
   $prompt += Write-Prompt -Object " $($MyInvocation.HistoryId) " -ForegroundColor $sl.Colors.DarkGray -BackgroundColor $sl.Colors.Cyan
   $prompt += Write-Prompt -Object $($sl.PromptSymbols.SegmentForwardSymbol) -ForegroundColor $sl.Colors.Cyan -BackgroundColor $sl.Colors.Gray
 
-  $driveLetter = $pwd.Drive.Name
   # Replace Slash in directory with desired character (>)
-  $fullPath = $pwd.Path.Replace("$($driveLetter):\", '').Replace('\', ' ' + $sl.PromptSymbols.ForwardHollowArrow + ' ')
+  ## THIS IS THE  PROBLEMM???
+
+
+
+
+
+
+
+
+
+
+  $fullPath = $pwd.Path.Replace("$($env:SystemDrive)\", '').Replace('\', ' ' + $sl.PromptSymbols.ForwardHollowArrow + ' ')
 
   if (Test-VirtualEnv) {
     $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.SessionInfoBackgroundColor -BackgroundColor $sl.Colors.Red
@@ -74,7 +84,7 @@ function Write-Theme {
     $prompt += Write-Prompt -Object "$($sl.PromptSymbols.SegmentForwardSymbol) " -ForegroundColor $sl.Colors.Red -BackgroundColor $sl.Colors.DarkCyan
   }
   else {
-    $prompt += Write-Prompt -Object " $driveLetter " -ForegroundColor $sl.Colors.DarkCyan -BackgroundColor $sl.Colors.Gray
+    $prompt += Write-Prompt -Object " $env:SystemDrive " -ForegroundColor $sl.Colors.DarkCyan -BackgroundColor $sl.Colors.Gray
     $prompt += Write-Prompt -Object $($sl.PromptSymbols.SegmentForwardSymbol) -ForegroundColor $sl.Colors.Gray -BackgroundColor $sl.Colors.DarkCyan
   }
 
@@ -108,7 +118,7 @@ function Write-Theme {
   $timestamp = Get-Date -f "T"
 
   # Writes the Invocation time and date
-  $prompt += Set-CursorForRightBlockWrite -textLength ($timestamp.Length + 15)
+  $prompt += Set-CursorForRightBlockWrite -textLength ($timestamp.Length + 13)
   $prompt += Write-Prompt $($sl.PromptSymbols.SegmentBackwardSymbol) -ForegroundColor $sl.Colors.DarkCyan
   $prompt += Write-Prompt $(Get-Elapsed) -ForegroundColor $sl.Colors.Yellow -BackgroundColor $sl.Colors.DarkCyan
   $prompt += Write-Prompt $($sl.PromptSymbols.SegmentBackwardSymbol) -ForegroundColor $sl.Colors.Blue -BackgroundColor $sl.Colors.DarkCyan
