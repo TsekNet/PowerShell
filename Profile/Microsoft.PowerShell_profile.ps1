@@ -199,7 +199,7 @@ function Install-Fonts {
     Write-Verbose "Installing Fonts to $($TestFont.DirectoryName)"
     git clone https://github.com/PowerLine/fonts
     Set-Location fonts
-    .\install.ps1
+    .\install.ps1 'Deja*' -Confirm:$false
   }
 }
 
@@ -233,7 +233,7 @@ function Open-HistoryFile { code-insiders (Get-PSReadLineOption | Select-Object 
 # Compute file hashes - useful for checking successful downloads
 function Get-FileHash256 {
   $sha_256_hash = (Get-FileHash -Algorithm SHA256 $args).hash
-  Write-Output "Hash for $args is '$sha_256_hash'"
+  Write-Output "Hash for $args is '$sha_256_hash' (copied to clipboard)."
   $sha_256_hash | clip
 }
 
