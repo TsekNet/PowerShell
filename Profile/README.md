@@ -24,7 +24,7 @@ These instructions will get you a copy of the project up and running on your loc
 Copy the following into a PowerShell prompt:
 
 ```powershell
-Invoke-WebRequest https://git.io/tseknetprofile -OutFile $profile; & $profile
+Invoke-WebRequest https://git.io/tseknetprofile -OutFile $profile; & $profile -Verbose
 ```
 
 **_NOTE:_** When running this for the first time, the startup may take a minute to install all the required modules & fonts.

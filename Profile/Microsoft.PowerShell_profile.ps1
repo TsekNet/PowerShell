@@ -92,7 +92,7 @@ function Set-WindowTitle {
     'Session'   = "$env:COMPUTERNAME".ToLower()
   }
 
-  $formatted_title = "PS [ $($host_title.Values -join ' | ') ]"
+  $formatted_title = "PS [$($host_title.Values -join ' | ')]"
 
   Write-Verbose "Setting Window Title to '$formatted_title'"
 
@@ -240,7 +240,7 @@ function Get-FileHash256 {
 function Get-ExportedFunctions {
   try {
     $helper_functions = (Get-Module $profile -ListAvailable | Select-Object -ExpandProperty ExportedCommands).Values.Name -join ', '
-    Write-Output "Helper functions: $helper_functions"
+    Write-Output "`$profile helper functions: $helper_functions"
   }
   catch {
     Write-Error "Error obtaining helper function list: $_"
@@ -305,7 +305,7 @@ Set-Alias ll Get-ChildItemColor -Option AllScope
 Set-Alias ls Get-ChildItemColorFormatWide -Option AllScope
 Set-Alias History Open-HistoryFile -Option AllScope
 
-Write-Verbose '==Getting list of helper functions=='
+Write-Verbose '==Getting and displaying list of helper functions=='
 Get-ExportedFunctions
 
 #endregion
