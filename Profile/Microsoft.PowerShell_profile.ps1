@@ -240,7 +240,7 @@ function Get-FileHash256 {
 function Get-ExportedFunctions {
   try {
     $helper_functions = (Get-Module $profile -ListAvailable | Select-Object -ExpandProperty ExportedCommands).Values.Name -join ', '
-    Write-Output "`$profile helper functions: $helper_functions"
+    Write-Host 'Profile helper functions: ' -NoNewline; Write-Host $helper_functions -ForegroundColor Green
   }
   catch {
     Write-Error "Error obtaining helper function list: $_"
