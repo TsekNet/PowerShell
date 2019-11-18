@@ -63,7 +63,7 @@ function Import-MyModules {
         continue
       }
       Install-Module -Name $Module -Scope AllUsers -Force -AllowClobber
-      Import-Module -Name $Module -Scope AllUsers -Verbose:$false
+      Import-Module -Name $Module -Scope Global -Verbose:$false
     }
   }
 }
