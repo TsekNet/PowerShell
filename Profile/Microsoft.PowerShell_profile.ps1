@@ -62,8 +62,8 @@ function Import-MyModules {
         Write-Error "Module `"$Module`" not found."
         continue
       }
-      Install-Module -Name $Module -Scope CurrentUser -Force -AllowClobber
-      Import-Module -Name $Module -Verbose:$false
+      Install-Module -Name $Module -Scope AllUsers -Force -AllowClobber
+      Import-Module -Name $Module -Scope AllUsers -Verbose:$false
     }
   }
 }
