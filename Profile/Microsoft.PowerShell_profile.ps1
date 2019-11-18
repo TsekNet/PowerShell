@@ -278,6 +278,10 @@ try {
     'Profile/Microsoft.PowerShell_profile.ps1',
   'Profile/Themes/TsekNet.psm1' -ThemeName 'TsekNet'
 
+  Write-Verbose '==Importing modules required for profile=='
+  $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
+  Import-MyModules -Modules $my_modules
+
   Write-Verbose '==Setting custom oh-my-posh theme=='
   Set-Theme 'TsekNet' -Verbose:$false
 
@@ -286,10 +290,6 @@ try {
 
   Write-Verbose '==Setting the console title=='
   Set-WindowTitle
-
-  Write-Verbose '==Importing modules required for profile=='
-  $my_modules = @('posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'PSWriteHTML')
-  Import-MyModules -Modules $my_modules
 
   Write-Verbose '==Setting the default directory for new PowerShell consoles=='
   Set-Path 'C:\Tmp'
