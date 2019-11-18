@@ -17,11 +17,9 @@ PowerShell running in a non-admin window while working in `C:\Tmp`
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
 ### Installation
 
-Copy the following into a PowerShell prompt:
+Copy the following into an administrative PowerShell prompt:
 
 ```powershell
 Invoke-WebRequest https://git.io/tseknetprofile -OutFile $profile; & $profile -Verbose
