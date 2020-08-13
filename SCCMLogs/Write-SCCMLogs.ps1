@@ -10,14 +10,17 @@
 .PARAMETER FailureString
   The string used to determine when the OS Upgrade failed.
 .PARAMETER Source
-  Specifies the event log source for writing logs.
+  Specifies the Event Log source for writing logs.
+.PARAMETER EntryType
+  Specifies the Event Log entry type for writing logs.
 #>
 [CmdletBinding()]
 param (
   [System.IO.FileInfo]$LogPath = "$env:WINDIR\CCM\Logs\Smstslog",
   [System.IO.FileInfo]$LogFile = 'smsts.log',
   [string]$FailureString = 'Task sequence execution failed with error code',
-  [string]$Source = 'InPlaceUpgrade'
+  [string]$Source = 'InPlaceUpgrade',
+  [string]$EntryType = 'Information'
 )
 
 # Create Log Source if necessary
@@ -39,7 +42,7 @@ if (-not (Test-Path $log)) {
 
 # Strip the CMTRACE loginfo from the log file. Logs are wrapped in
 # <!\[LOG\[ DATA \]LOG\]!>. All we want is the DATA. Also helps keep
-# under the 32KB limit for event log messages.
+# under the 32KB limit for Event Log messages.
 try {
   $formatted_log = Get-Content $log -Raw |
     ForEach-Object { $_ -replace '<!\[LOG\[', '' } |
@@ -68,7 +71,7 @@ try {
   $params = @{
     LogName   = 'Application'
     Source    = $Source
-    EntryType = 'Information'
+    EntryType = $EntryType
     EventId   = 1337
     Message   = $formatted_log
   }
