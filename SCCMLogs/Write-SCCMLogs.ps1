@@ -53,9 +53,9 @@ catch {
 }
 
 $length = $formatted_log.Length
-# Trim log to under max Event Log size.
+# Optionally trim log to under max Event Log size (32KB) to grab latest logs.
 if ($length -gt 32766) {
-  $formatted_log = $formatted_log[($length - 32766)..$length] -join ''
+  $formatted_log = $formatted_log[($length - 31000)..$length] -join ''
 }
 
 # Change log level and prepend custom success/failure string.
@@ -71,11 +71,11 @@ try {
   $params = @{
     LogName   = 'Application'
     Source    = $Source
-    EntryType = $EntryType
     EventId   = 1337
+    EntryType = $EntryType
     Message   = $formatted_log
   }
-  Write-EventLog @params
+  Write-EventLog @params -ErrorAction Stop
 }
 catch {
   throw "Failed to export SCCM Event Log: $_"
