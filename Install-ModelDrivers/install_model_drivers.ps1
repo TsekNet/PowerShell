@@ -20,7 +20,7 @@
 .PARAMETER SkipInstall
   [OPTIONAL] Don't install drivers via pnp. Just download the drivers to
   $env:TEMP and exit.
-.PARAMETER SkipInstall
+.PARAMETER SkipCleanup
   [OPTIONAL] Don't cleanup temporary folders or registry keys.
 .EXAMPLE
   .\install_drivers.ps1 -Manufacturer Lenovo -Model 20y0
@@ -174,8 +174,8 @@ function Install-Drivers {
     Write-Host "Installing all drivers under [$Destination]..."
 
     # https://www.deploymentresearch.com/back-to-basics-pnp-exe-vs-pnpunattend-exe/
-    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths" -Name 1 -Force | Out-Null
-    New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1" -Name Path -Value $Destination -Force | Out-Null
+    New-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths' -Name 1 -Force | Out-Null
+    New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1' -Name Path -Value $Destination -Force | Out-Null
 
     $pnp = "$env:WINDIR\system32\PnPUnattend.exe"
 
@@ -225,7 +225,7 @@ try {
   } else {
     Write-Host 'Cleaning up...'
     Remove-Item $TEMP_PATH -Force -Recurse -ErrorAction Continue
-    Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1" -Recurse -Force
+    Remove-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1' -Recurse -Force
   }
 
   $ProgressPreference = $OldProgressPreference
