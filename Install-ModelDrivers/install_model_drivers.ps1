@@ -12,7 +12,7 @@
 .PARAMETER Manufacturer
   The Manufacturer of the device. Must be one of 'Lenovo', 'Dell', 'HP'.
 .PARAMETER DownloadOnly
-  [OPTIONAL] Don't install drivers via pnputil. Just download the drivers to
+  [OPTIONAL] Don't install drivers via pnp. Just download the drivers to
   $env:TEMP and exit.
 .PARAMETER Model
   The literal regex string that matches a URL on the Manufacturer's website
@@ -31,7 +31,8 @@
 .EXAMPLE
   .\install_drivers.ps1 -Manufacturer Dell -Model 9380
 
-  Downloads Dell driver installer matching the regex 9380 exact string to "$env:TEMP\Dell" then installs the drivers from the expanded installer.
+  Downloads Dell driver installer matching the regex 9380 exact string to
+  "$env:TEMP\Dell" then installs the drivers from the expanded installer.
 #>
 
 [CmdletBinding()]
@@ -162,13 +163,15 @@ function Install-Drivers {
 
   try {
     Write-Host "Installing all drivers under [$Destination]..."
-    $pnputil = "$env:WINDIR\System32\pnputil.exe"
 
-    foreach ($driver_path in $driver_paths) {
-      $driver = $driver_path.FullName
-      Write-Host "Executing [$pnputil /add-driver '$driver' /install]"
-      # $process = Start-Process -FilePath $pnputil -ArgumentList @('/add-driver', "'$driver'", '/install') -PassThru -Wait
-    }
+    # https://www.deploymentresearch.com/back-to-basics-pnp-exe-vs-pnpunattend-exe/
+    New-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths" -Name 1 -Force | Out-Null
+    New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1" -Name Path -Value $Destination -Force | Out-Null
+
+    $pnp = "$env:WINDIR\system32\PnPUnattend.exe"
+
+    Write-Host "Executing [$pnp auditSystem /L]"
+    $process = Start-Process -FilePath $pnp -ArgumentList @('auditSystem', '/L') -PassThru -Wait
   } catch {
     throw "Failed to install driver with exit code [$($process.ExitCode)]: $_"
   }
@@ -204,6 +207,7 @@ try {
 } finally {
   if (-not $DownloadOnly) {
     Remove-Item $TEMP_PATH -Force -Recurse -ErrorAction Continue
+    Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1" -Recurse -Force
   }
   $ProgressPreference = $OldProgressPreference
 }
