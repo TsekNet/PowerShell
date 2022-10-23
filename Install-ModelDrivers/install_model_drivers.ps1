@@ -11,12 +11,15 @@
   display, etc. drivers.
 .PARAMETER Manufacturer
   The Manufacturer of the device. Must be one of 'Lenovo', 'Dell', 'HP'.
-.PARAMETER DownloadOnly
-  [OPTIONAL] Don't install drivers via pnp. Just download the drivers to
-  $env:TEMP and exit.
 .PARAMETER Model
   The literal regex string that matches a URL on the Manufacturer's website
   pointing to the exact download URL of the driver.
+.PARAMETER SkipDownload
+  [OPTIONAL] Don't download drivers from the Manufacturer website. Just execute
+  drivers that were previously downloaded.
+.PARAMETER SkipInstall
+  [OPTIONAL] Don't install drivers via pnp. Just download the drivers to
+  $env:TEMP and exit.
 .EXAMPLE
   .\install_drivers.ps1 -Manufacturer Lenovo -Model 20y0
 
@@ -42,7 +45,9 @@ param (
   [Parameter(Mandatory)]
   [string]$Model,
   [Parameter()]
-  [switch]$DownloadOnly
+  [switch]$SkipDownload,
+  [Parameter()]
+  [switch]$SkipInstall
 )
 
 function Get-RegexMatch {
@@ -58,12 +63,12 @@ function Get-RegexMatch {
   # file_regex was manually tested against multiple models
   # match_index is required if we have multiple regex groups
   switch ($Manufacturer) {
-    'Lenovo' {
+    'LENOVO' {
       $manufacturer_uri = 'https://download.lenovo.com/cdrt/td/catalogv2.xml'
       $file_regex = "https.*?$Model.*?exe"
       $match_index = 0
     }
-    'Dell' {
+    'DELL' {
       $manufacturer_uri = 'https://www.dell.com/support/kbdoc/en-uk/000180534/dell-family-driver-packs'
       $file_regex = "(?:$Model.*?[\s\S]*?)(https.*?zip)"
       $match_index = 1
@@ -192,22 +197,25 @@ try {
     New-Item -ItemType Directory $TEMP_PATH -Force | Out-Null
   }
 
-  $regex_uri, $file_name = Get-RegexMatch -Manufacturer $Manufacturer -Model $Model
-  $installer = "$TEMP_PATH\$file_name"
+  if (-not $SkipDownload) {
+    $regex_uri, $file_name = Get-RegexMatch -Manufacturer $Manufacturer -Model $Model
+    $installer = "$TEMP_PATH\$file_name"
 
-  Get-Installer -DownloadURI $regex_uri -InstallerName $installer
+    Get-Installer -DownloadURI $regex_uri -InstallerName $installer
 
-  Expand-Installer -Manufacturer $Manufacturer -InstallerName $installer -Destination $TEMP_PATH
+    Expand-Installer -Manufacturer $Manufacturer -InstallerName $installer -Destination $TEMP_PATH
+  }
 
-  if (-not $DownloadOnly) {
+  if (-not $SkipInstall) {
     Install-Drivers -Destination $TEMP_PATH
   }
 } catch {
   throw $_
 } finally {
-  if (-not $DownloadOnly) {
+  if (-not $SkipInstall) {
     Remove-Item $TEMP_PATH -Force -Recurse -ErrorAction Continue
     Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1" -Recurse -Force
   }
+
   $ProgressPreference = $OldProgressPreference
 }
