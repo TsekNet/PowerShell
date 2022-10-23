@@ -20,6 +20,8 @@
 .PARAMETER SkipInstall
   [OPTIONAL] Don't install drivers via pnp. Just download the drivers to
   $env:TEMP and exit.
+.PARAMETER SkipInstall
+  [OPTIONAL] Don't cleanup temporary folders or registry keys.
 .EXAMPLE
   .\install_drivers.ps1 -Manufacturer Lenovo -Model 20y0
 
@@ -47,7 +49,9 @@ param (
   [Parameter()]
   [switch]$SkipDownload,
   [Parameter()]
-  [switch]$SkipInstall
+  [switch]$SkipInstall,
+  [Parameter()]
+  [switch]$SkipCleanup
 )
 
 function Get-RegexMatch {
@@ -192,12 +196,14 @@ $OldProgressPreference = $ProgressPreference
 $global:ProgressPreference = 'SilentlyContinue'
 
 try {
-  if (-not (Test-Path $TEMP_PATH)) {
-    Write-Host "Creating directory: [$TEMP_PATH]"
-    New-Item -ItemType Directory $TEMP_PATH -Force | Out-Null
-  }
+  if ($SkipDownload) {
+    Write-Host 'Skipping download...'
+  } else {
+    if (-not (Test-Path $TEMP_PATH)) {
+      Write-Host "Creating directory: [$TEMP_PATH]"
+      New-Item -ItemType Directory $TEMP_PATH -Force | Out-Null
+    }
 
-  if (-not $SkipDownload) {
     $regex_uri, $file_name = Get-RegexMatch -Manufacturer $Manufacturer -Model $Model
     $installer = "$TEMP_PATH\$file_name"
 
@@ -206,13 +212,17 @@ try {
     Expand-Installer -Manufacturer $Manufacturer -InstallerName $installer -Destination $TEMP_PATH
   }
 
-  if (-not $SkipInstall) {
+  if ($SkipInstall) {
+    Write-Host 'Skipping installation...'
+  } else {
     Install-Drivers -Destination $TEMP_PATH
   }
 } catch {
   throw $_
 } finally {
-  if (-not $SkipInstall) {
+  if ($SkipCleanup) {
+    Write-Host 'Skipping cleanup...'
+  } else {
     Remove-Item $TEMP_PATH -Force -Recurse -ErrorAction Continue
     Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1" -Recurse -Force
   }
