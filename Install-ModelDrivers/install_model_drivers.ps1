@@ -180,7 +180,7 @@ function Install-Drivers {
     $pnp = "$env:WINDIR\system32\PnPUnattend.exe"
 
     Write-Host "Executing [$pnp auditSystem /L]"
-    $process = Start-Process -FilePath $pnp -ArgumentList @('auditSystem', '/L') -PassThru -Wait
+    $process = Start-Process -FilePath $pnp -ArgumentList @('auditSystem', '/L') -NoNewWindow -PassThru -Wait
   } catch {
     throw "Failed to install driver with exit code [$($process.ExitCode)]: $_"
   }
@@ -223,6 +223,7 @@ try {
   if ($SkipCleanup) {
     Write-Host 'Skipping cleanup...'
   } else {
+    Write-Host 'Cleaning up...'
     Remove-Item $TEMP_PATH -Force -Recurse -ErrorAction Continue
     Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1" -Recurse -Force
   }
