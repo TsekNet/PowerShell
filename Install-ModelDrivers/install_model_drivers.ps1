@@ -11,6 +11,9 @@
   display, etc. drivers.
 .PARAMETER Manufacturer
   The Manufacturer of the device. Must be one of 'Lenovo', 'Dell', 'HP'.
+.PARAMETER DownloadOnly
+  [OPTIONAL] Don't install drivers via pnputil. Just download the drivers to
+  $env:TEMP and exit.
 .PARAMETER Model
   The literal regex string that matches a URL on the Manufacturer's website
   pointing to the exact download URL of the driver.
@@ -36,7 +39,9 @@ param (
   [Parameter(Mandatory)]
   [string]$Manufacturer,
   [Parameter(Mandatory)]
-  [string]$Model
+  [string]$Model,
+  [Parameter()]
+  [switch]$DownloadOnly
 )
 
 function Get-RegexMatch {
@@ -191,10 +196,14 @@ try {
 
   Expand-Installer -Manufacturer $Manufacturer -InstallerName $installer -Destination $TEMP_PATH
 
-  Install-Drivers -Destination $TEMP_PATH
+  if (-not $DownloadOnly) {
+    Install-Drivers -Destination $TEMP_PATH
+  }
 } catch {
   throw $_
 } finally {
-  Remove-Item $TEMP_PATH -Force -Recurse -ErrorAction Continue
+  if (-not $DownloadOnly) {
+    Remove-Item $TEMP_PATH -Force -Recurse -ErrorAction Continue
+  }
   $ProgressPreference = $OldProgressPreference
 }
