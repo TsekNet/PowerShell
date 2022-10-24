@@ -22,21 +22,27 @@
 .PARAMETER SkipCleanup
   [OPTIONAL] Don't cleanup temporary folders or registry keys.
 .EXAMPLE
-  .\install_drivers.ps1 -Manufacturer Lenovo -Model 20y0
+  .\install_model_drivers.ps1 -Manufacturer Lenovo -Model 20y0
 
   Downloads Lenovo driver installer matching the regex 20y0 exact string to
   "$env:TEMP\Lenovo" then installs the drivers from the expanded installer.
 .EXAMPLE
-  .\install_drivers.ps1 -Manufacturer HP -Model Z440
+  .\install_model_drivers.ps1 -Manufacturer HP -Model Z440
 
   Downloads HP driver installer matching the regex Z440 exact string to
   "$env:TEMP\HP" then installs the drivers from the expanded installer.
-
 .EXAMPLE
-  .\install_drivers.ps1 -Manufacturer Dell -Model 9380
+  .\install_model_drivers.ps1 -Manufacturer Dell -Model 9380
 
   Downloads Dell driver installer matching the regex 9380 exact string to
   "$env:TEMP\Dell" then installs the drivers from the expanded installer.
+.EXAMPLE
+  .\install_model_drivers.ps1 -Manufacturer Microsoft -Model
+  'Surface Laptop 4 with Intel Processor'
+
+  Downloads Microsoft driver installer matching the regex '
+  Surface Laptop 4 with Intel Processor' exact string to "$env:TEMP\Microsoft"
+  then installs the drivers via the msi installer.
 #>
 
 [CmdletBinding()]
@@ -115,7 +121,7 @@ function Get-RegexMatch {
       $match_index = 1
     }
     # Microsoft hides their links behind (at least) two clicks...
-    'Microsoft' {
+    'MICROSOFT' {
       $manufacturer_uri = 'https://learn.microsoft.com/en-us/surface/manage-surface-driver-and-firmware-updates'
       # Example: <a href="https://www.microsoft.com/download/details.aspx?id=102924" data-linktype="external">Surface Laptop 4 with Intel Processor</a>
       $file_regex = "(\d{6})(?:`" data-linktype=`"external`">$Model)"
@@ -177,7 +183,7 @@ function Invoke-Installer {
     'HP' {
       $arg_list = @('-s', '-f', $Destination)
     }
-    'Microsoft' {
+    'MICROSOFT' {
       $arg_list = @('/qn', '/norestart')
     }
     default { throw "Manufacturer [$Manufacturer] is not (yet) supported..." }
