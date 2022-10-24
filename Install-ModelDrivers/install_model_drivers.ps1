@@ -17,9 +17,8 @@
 .PARAMETER SkipDownload
   [OPTIONAL] Don't download drivers from the Manufacturer website. Just execute
   drivers that were previously downloaded.
-.PARAMETER SkipInstall
-  [OPTIONAL] Don't install drivers via pnp. Just download the drivers to
-  $env:TEMP and exit.
+.PARAMETER SkipPnP
+  [OPTIONAL] Don't install drivers via pnp.
 .PARAMETER SkipCleanup
   [OPTIONAL] Don't cleanup temporary folders or registry keys.
 .EXAMPLE
@@ -49,10 +48,40 @@ param (
   [Parameter()]
   [switch]$SkipDownload,
   [Parameter()]
-  [switch]$SkipInstall,
+  [switch]$SkipPnP,
   [Parameter()]
   [switch]$SkipCleanup
 )
+
+function Get-URL {
+  [CmdletBinding()]
+  Param (
+    [Parameter(Mandatory)]
+    [string]$URI,
+    [Parameter(Mandatory)]
+    [string]$FileRegEx,
+    [Parameter(Mandatory)]
+    [int]$MatchIndex
+  )
+  try {
+    Write-Host "Getting driver download URL from [$URI]"
+    $req = Invoke-WebRequest -Uri $URI -UseBasicParsing
+  } catch {
+    throw "Failed to navigate to [$URI]"
+  }
+
+  $regex_search = $req.Content -match $FileRegEx
+  if (-not $regex_search) {
+    throw "Failed to find a match for [$FileRegEx] in [$URI]"
+  }
+
+  # URLs have file paths that are seperated by forward slashes...
+  # Grab the last item in the split list of items separated by forward slashes,
+  # as it's usually the file name.
+  $file_name = ($Matches[$MatchIndex] -split '/')[-1]
+
+  return $Matches[$MatchIndex], $file_name
+}
 
 function Get-RegexMatch {
   [CmdletBinding()]
@@ -69,40 +98,40 @@ function Get-RegexMatch {
   switch ($Manufacturer) {
     'LENOVO' {
       $manufacturer_uri = 'https://download.lenovo.com/cdrt/td/catalogv2.xml'
+      # Example: <SCCM os="win10" version="1909" crc="e2c56fbad5b2689fbe6246dcfd68a72616a0c08d2dd915ed8a88802291cb89a2">https://download.lenovo.com/pccbbs/mobiles/tp_x1carbon_mt20xw-20xx-x1yoga_mt20xy-20y0_w1064_1909_202107.exe</SCCM>
       $file_regex = "https.*?$Model.*?exe"
       $match_index = 0
     }
     'DELL' {
       $manufacturer_uri = 'https://www.dell.com/support/kbdoc/en-uk/000180534/dell-family-driver-packs'
+      # Example: <td colspan="1" rowspan="1">9330</td> ... <a href="https://fta.dell.com/0/DIA/Drivers/win11_latitudee14mlk9330_a03.zip" target="_self">A03 (09/26/22)</a>
       $file_regex = "(?:$Model.*?[\s\S]*?)(https.*?zip)"
       $match_index = 1
     }
     'HP' {
       $manufacturer_uri = 'https://hpia.hpcloud.hp.com/downloads/driverpackcatalog/HP_Driverpack_Matrix_x64.html'
+      # Example: <p>HP ProBook x360 440 G1 Notebook PC</p> ... <a href="https://ftp.hp.com/pub/softpaq/sp114001-114500/sp114238.exe" ... </a>
       $file_regex = "(?:$Model.*?)(https.*?exe)"
       $match_index = 1
+    }
+    # Microsoft hides their links behind (at least) two clicks...
+    'Microsoft' {
+      $manufacturer_uri = 'https://learn.microsoft.com/en-us/surface/manage-surface-driver-and-firmware-updates'
+      # Example: <a href="https://www.microsoft.com/download/details.aspx?id=102924" data-linktype="external">Surface Laptop 4 with Intel Processor</a>
+      $file_regex = "(\d{6})(?:`" data-linktype=`"external`">$Model)"
+      $match_index = 1
+      $id, $null = Get-URL -URI $manufacturer_uri -FileRegEx $file_regex -MatchIndex $match_index
+
+      $manufacturer_uri = "https://www.microsoft.com/en-us/download/confirmation.aspx?id=$id"
+      # Example: <a ... href="https://download.microsoft.com/download/f/7/0/f70b3d0a-59b1-4842-9130-0c152bb738ba/SurfaceLaptop4_Win11_22000_22.093.37381.0.msi" ...>click here to download manually</strong></a>
+      $file_regex = '(http.*?\.msi)'
+      $match_index = 0
+      return Get-URL -URI $manufacturer_uri -FileRegEx $file_regex -MatchIndex $match_index
     }
     default { throw "Manufacturer [$Manufacturer] is not (yet) supported..." }
   }
 
-  try {
-    Write-Host "Getting driver download URL from [$manufacturer_uri]"
-    $req = Invoke-WebRequest -Uri $manufacturer_uri -UseBasicParsing
-  } catch {
-    throw "Failed to navigate to [$manufacturer_uri]"
-  }
-
-  $regex_search = $req.Content -match $file_regex
-  if (-not $regex_search) {
-    throw "Failed to find a match for [$file_regex] in [$manufacturer_uri]"
-  }
-
-  # URLs have file paths that are seperated by forward slashes...
-  # Grab the last item in the split list of items separated by forward slashes,
-  # as it's usually the file name.
-  $file_name = ($Matches[$match_index] -split '/')[-1]
-
-  return $Matches[$match_index], $file_name
+  return Get-URL -URI $manufacturer_uri -FileRegEx $file_regex -MatchIndex $match_index
 }
 
 function Get-Installer {
@@ -122,7 +151,7 @@ function Get-Installer {
   }
 }
 
-function Expand-Installer {
+function Invoke-Installer {
   [CmdletBinding()]
   Param (
     [Parameter(Mandatory)]
@@ -149,6 +178,9 @@ function Expand-Installer {
     'HP' {
       $arg_list = @('-s', '-f', $Destination)
     }
+    'Microsoft' {
+      $arg_list = @('/qn', '/norestart')
+    }
     default { throw "Manufacturer [$Manufacturer] is not (yet) supported..." }
   }
 
@@ -157,7 +189,7 @@ function Expand-Installer {
 }
 
 
-function Install-Drivers {
+function Invoke-PnP {
   [CmdletBinding()]
   Param (
     [Parameter(Mandatory)]
@@ -209,13 +241,14 @@ try {
 
     Get-Installer -DownloadURI $regex_uri -InstallerName $installer
 
-    Expand-Installer -Manufacturer $Manufacturer -InstallerName $installer -Destination $TEMP_PATH
+    Invoke-Installer -Manufacturer $Manufacturer -InstallerName $installer -Destination $TEMP_PATH
   }
 
-  if ($SkipInstall) {
-    Write-Host 'Skipping installation...'
+  # Surface does not install drivers via PnP, just via an MSI installer.
+  if ($SkipPnP -or ($Model -like '*Surface*')) {
+    Write-Host 'Skipping PnP installation...'
   } else {
-    Install-Drivers -Destination $TEMP_PATH
+    Invoke-PnP -Destination $TEMP_PATH
   }
 } catch {
   throw $_
@@ -225,7 +258,10 @@ try {
   } else {
     Write-Host 'Cleaning up...'
     Remove-Item $TEMP_PATH -Force -Recurse -ErrorAction Continue
-    Remove-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1' -Recurse -Force
+
+    if ($Model -notlike '*Surface*') {
+      Remove-Item -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\UnattendSettings\PnPUnattend\DriverPaths\1' -Recurse -Force
+    }
   }
 
   $ProgressPreference = $OldProgressPreference
