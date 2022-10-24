@@ -126,7 +126,6 @@ function Get-RegexMatch {
       # Example: <a ... href="https://download.microsoft.com/download/f/7/0/f70b3d0a-59b1-4842-9130-0c152bb738ba/SurfaceLaptop4_Win11_22000_22.093.37381.0.msi" ...>click here to download manually</strong></a>
       $file_regex = '(http.*?\.msi)'
       $match_index = 0
-      return Get-URL -URI $manufacturer_uri -FileRegEx $file_regex -MatchIndex $match_index
     }
     default { throw "Manufacturer [$Manufacturer] is not (yet) supported..." }
   }
