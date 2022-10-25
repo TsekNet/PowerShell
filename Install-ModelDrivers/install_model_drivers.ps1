@@ -10,7 +10,7 @@
   but may lead to system instability caused by replacing storage, network,
   display, etc. drivers.
 .PARAMETER Manufacturer
-  The Manufacturer of the device. Must be one of 'Lenovo', 'Dell', 'HP'.
+  The Manufacturer of the device. Must be one of 'LENOVO', 'DELL', 'HP', 'MICROSOFT'.
 .PARAMETER Model
   The literal regex string that matches a URL on the Manufacturer's website
   pointing to the exact download URL of the driver.
@@ -169,7 +169,7 @@ function Invoke-Installer {
 
   switch ($Manufacturer) {
     'Lenovo' {
-      $arg_list = @('/SP-', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=$Destination")
+      $arg_list = @('/SP-', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=$Destination", '/LOG')
     }
     'Dell' {
       try {
@@ -184,7 +184,7 @@ function Invoke-Installer {
       $arg_list = @('-s', '-f', $Destination)
     }
     'MICROSOFT' {
-      $arg_list = @('/qn', '/norestart')
+      $arg_list = @('/qn', '/norestart', '/l*v', "$Destination\driver_install.log")
     }
     default { throw "Manufacturer [$Manufacturer] is not (yet) supported..." }
   }
