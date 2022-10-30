@@ -1,12 +1,12 @@
 ﻿<#
 .SYNOPSIS
-  Export SCCM OS Upgrade logs to the Event Log.
+  Export SCCM logs to the Event Log.
 .DESCRIPTION
-  Regex Parse the SCCM SMSTS.log file and dump to Event Log.
+  Regex Parse a log file and dump to Event Log.
 .PARAMETER LogPath
   Folder to recursively search for the LogFile.
 .PARAMETER LogFile
-  Location of SMSTS.log on the local system.
+  Location of log file on the local system.
 .PARAMETER FailureString
   The string used to determine when the OS Upgrade failed.
 .PARAMETER Source
@@ -27,8 +27,7 @@ param (
 if (-not [System.Diagnostics.EventLog]::SourceExists($Source)) {
   try {
     New-EventLog -LogName Application -Source $Source
-  }
-  catch {
+  } catch {
     throw "Failed to create log source: $_"
   }
 }
@@ -37,7 +36,7 @@ $log = "$LogPath\$LogFile"
 
 # Exit if there is no log file to write to.
 if (-not (Test-Path $log)) {
-  throw "Failed to locate SCCM log: $log"
+  throw "Failed to locate log file: $log"
 }
 
 # Strip the CMTRACE loginfo from the log file. Logs are wrapped in
@@ -47,8 +46,7 @@ try {
   $formatted_log = Get-Content $log -Raw |
     ForEach-Object { $_ -replace '<!\[LOG\[', '' } |
       ForEach-Object { $_ -replace '\]LOG\]!>(.*)', '' }
-}
-catch {
+} catch {
   throw "Failed to read log file '$log' with error $_"
 }
 
@@ -60,11 +58,10 @@ if ($length -gt 32766) {
 
 # Change log level and prepend custom success/failure string.
 if ($formatted_log -match $FailureString) {
-  $formatted_log = "IPU failed:`n$formatted_log"
+  $formatted_log = "Failure detected:`n$formatted_log"
   $EntryType = 'Error'
-}
-else {
-  $formatted_log = "IPU succeeded:`n$formatted_log"
+} else {
+  $formatted_log = "Succeeded:`n$formatted_log"
 }
 
 try {
@@ -76,7 +73,6 @@ try {
     Message   = $formatted_log
   }
   Write-EventLog @params -ErrorAction Stop
-}
-catch {
-  throw "Failed to export SCCM Event Log: $_"
+} catch {
+  throw "Failed to export Event Log from file: $_"
 }
